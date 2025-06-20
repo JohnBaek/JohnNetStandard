@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 namespace JohnIsDev.Core.Features.Aop;
 
 /// <summary>
-/// Remove \n 
+/// Remove
 /// </summary>
 public class RemoveLeadingNewLineAspect : AbstractInterceptorAttribute
 {
