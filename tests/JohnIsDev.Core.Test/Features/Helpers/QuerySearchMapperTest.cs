@@ -63,10 +63,6 @@ public class QuerySearchMapperTest
     [Fact]
     public void ExtractSearchMetaFromAttributes_ShouldCached()
     {
-        
-        // Merge Test
-        
-        
         // Call first - Should be Reflected
         var firstCall = QuerySearchMapper.ExtractSearchMetaFromAttributes<TestClass>();
         firstCall.Should().NotBeNull();
@@ -90,4 +86,25 @@ public class TestClass
     
     [QueryMetaConvert(EnumQuerySearchType.Equals)]
     public string Equals { get; set; } = "";
+    
+    [QueryMetaConvert(EnumQuerySearchType.GreaterThen)]
+    public string GreaterThen { get; set; } = "";
+    
+    [QueryMetaConvert(EnumQuerySearchType.LessThen)]
+    public string LessThen { get; set; } = "";
+    
+    [QueryMetaConvert(EnumQuerySearchType.EqualsNumeric)]
+    public string EqualsNumeric { get; set; } = "";
+    
+    [QueryMetaConvert(EnumQuerySearchType.NumericOrEnums)]
+    public string NumericOrEnums { get; set; } = "";
+    
+    [QueryMetaConvert(EnumQuerySearchType.StartDate)]
+    public string StartDate { get; set; } = "";
+    
+    [QueryMetaConvert(EnumQuerySearchType.EndDate)]
+    public string EndDate { get; set; } = "";
+    
+    [QueryMetaConvert(EnumQuerySearchType.RangeDate)]
+    public string RangeDate { get; set; } = "";
 }
