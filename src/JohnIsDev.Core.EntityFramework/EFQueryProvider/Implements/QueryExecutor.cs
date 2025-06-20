@@ -114,10 +114,16 @@ public class QueryExecutor<TDbContext>(
             List<TConvert> convertList = new List<TConvert>(result.Items.Select(resultItem => resultItem.FromCopyValue<TConvert>()));
             
             // Convert ResponseList<TConvert>
-            ResponseList<TConvert> convertedResponse = result.FromCopyValue<ResponseList<TConvert>>();
-            convertedResponse.Items = convertList;
-            
-            return new ResponseList<TConvert>(EnumResponseResult.Success, "", "", convertList);
+            return new ResponseList<TConvert>
+            {
+                Result = result.Result,
+                Code = result.Code,
+                Message = result.Message,
+                TotalCount = result.TotalCount,
+                Skip = result.Skip,
+                PageCount = result.PageCount,
+                Items = convertList
+            };
         }
         catch (Exception e)
         {

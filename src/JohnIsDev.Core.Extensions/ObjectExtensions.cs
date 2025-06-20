@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace JohnIsDev.Core.Extensions;
@@ -6,7 +7,7 @@ namespace JohnIsDev.Core.Extensions;
 /// <summary>
 /// Object 확장
 /// </summary>
-public static class ObjectExtensions
+public static class ObjectExtensions 
 {
     /// <summary>
     /// T 데이터를 T로 클로닝 한다.
@@ -41,42 +42,49 @@ public static class ObjectExtensions
         
         return cloned;
     }
-    
+
     /// <summary>
-    /// 대상소스로부터 데이터를 카피해서 T 형으로 반환한다.
+    /// Copies property values from the source object to a new instance of type T.
     /// </summary>
-    /// <param name="source"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
+    /// <param name="source">The source object containing the data to copy.</param>
+    /// <typeparam name="T">The type of the object to create and populate.</typeparam>
+    /// <returns>A new instance of type T with properties populated from the source object.</returns>
+    /// <exception cref="Exception">Thrown if an error occurs during property copying or object creation.</exception>
     public static T FromCopyValue<T>(this object source) where T : class
     {
         T? destination = Activator.CreateInstance<T>();
-
-        // 소스 데이터로부터 프로퍼티를 가져온다.
-        PropertyInfo[] sourceProperties = source.GetType().GetProperties();
-
-        // 목적지 데이터로부터 프로퍼티를 가져온다.
-        PropertyInfo[] destinationProperties = destination.GetType().GetProperties();
-    
-        // 모든 소스데이터에 대해 처리한다.
-        foreach (PropertyInfo sourceProperty in sourceProperties)
+        try
         {
-            // 모든 목적지 데이터에 대해 처리한다.
-            foreach (PropertyInfo destinationProperty in destinationProperties)
+            // 소스 데이터로부터 프로퍼티를 가져온다.
+            PropertyInfo[] sourceProperties = source.GetType().GetProperties();
+
+            // 목적지 데이터로부터 프로퍼티를 가져온다.
+            PropertyInfo[] destinationProperties = destination.GetType().GetProperties();
+    
+            // 모든 소스데이터에 대해 처리한다.
+            foreach (PropertyInfo sourceProperty in sourceProperties)
             {
-                // Is Name and Type is Not identical
-                if (sourceProperty.Name != destinationProperty.Name || sourceProperty.PropertyType != destinationProperty.PropertyType) 
-                    // Next 
-                    continue;
+                // 모든 목적지 데이터에 대해 처리한다.
+                foreach (PropertyInfo destinationProperty in destinationProperties)
+                {
+                    // Is Name and Type is Not identical
+                    if (sourceProperty.Name != destinationProperty.Name || sourceProperty.PropertyType != destinationProperty.PropertyType) 
+                        // Next 
+                        continue;
                 
-                // Update value. sourceProperty to destination
-                destinationProperty.SetValue(destination, sourceProperty.GetValue(source));
-                break;
+                    // Update value. sourceProperty to destination
+                    destinationProperty.SetValue(destination, sourceProperty.GetValue(source));
+                    break;
+                }
             }
-        }
         
-        // 수정된 destination을 반환한다.
-        return destination; 
+            // 수정된 destination을 반환한다.
+            return destination; 
+        }
+        catch (Exception) 
+        {
+            throw;
+        }
     }
 
     /// <summary>
