@@ -3,7 +3,7 @@ namespace JohnIsDev.Core.Models.Responses;
 /// <summary>
 /// 응답 기본 설정 데이터
 /// </summary>
-public class ResponseCommonWriter
+public class ResponseCommonWriter 
 {
     /// <summary>
     /// 등록일 (필수)

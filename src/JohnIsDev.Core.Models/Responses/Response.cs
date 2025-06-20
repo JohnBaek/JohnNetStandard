@@ -3,7 +3,7 @@ using JohnIsDev.Core.Models.Common.Enums;
 namespace JohnIsDev.Core.Models.Responses;
 
 /// <summary>
-/// 기초 응답 데이터 클래스 
+/// Represents a standardized response object that encapsulates the result of an operation, including a response code, message, and result type.
 /// </summary>
 public class Response
 {
