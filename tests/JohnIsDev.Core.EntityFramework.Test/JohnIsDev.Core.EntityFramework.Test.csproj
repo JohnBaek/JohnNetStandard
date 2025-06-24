@@ -25,6 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\Providers\CommonDataProviders\CommonDataProviders.csproj" />
       <ProjectReference Include="..\..\src\JohnIsDev.Core.EntityFramework\JohnIsDev.Core.EntityFramework.csproj" />
     </ItemGroup>
 
