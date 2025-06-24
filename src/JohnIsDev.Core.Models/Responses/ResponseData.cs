@@ -21,6 +21,17 @@ public class ResponseData<T> : Response
     }
 
     /// <summary>
+    /// Represents a response data model that includes an object of type T along with the response details.
+    /// </summary>
+    /// <typeparam name="T">The type of the data included in the response.</typeparam>
+    public ResponseData(ResponseData<T> targetCopy)
+    {
+        Result = targetCopy.Result;
+        Code = targetCopy.Code;
+        Message = targetCopy.Message;
+    }
+
+    /// <summary>
     /// 생성자
     /// </summary>
     /// <param name="result"></param>
