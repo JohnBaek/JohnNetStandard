@@ -54,32 +54,73 @@ public class QueryBuilder<TDbContext>(
     /// <param name="requestQuery">An object containing filters, sorting, and pagination criteria.</param>
     /// <param name="queryable">The IQueryable instance to apply the query conditions to.</param>
     /// <returns>An IQueryable of type T with the applied query conditions, or null if an error occurs.</returns>
-    public IQueryable<T>? BuildQuery<T>(RequestQuery requestQuery, IQueryable<T> queryable) where T : class
+    // JohnIsDev.Core.EntityFramework.EFQueryProvider.Implements.QueryBuilder
+public IQueryable<T>? BuildQuery<T>(RequestQuery requestQuery, IQueryable<T> queryable) where T : class
+{
+    try
     {
-        try
-        {
-            // Create a where statement by meta-information
-            List<Expression<Func<T, bool>>> whereConditions = CreateSearchConditions<T>(requestQuery);
-            
-            // Adds conditions to the queryable.
-            if(whereConditions.Count > 0)
-                queryable = whereConditions.Aggregate(queryable, (current, condition) => current.Where(condition));
+        // Where 조건 생성 (기존 로직과 동일)
+        List<Expression<Func<T, bool>>> whereConditions = CreateSearchConditions<T>(requestQuery);
+        if (whereConditions.Count > 0)
+            queryable = whereConditions.Aggregate(queryable, (current, condition) => current.Where(condition));
+        
+        // --- 수정된 정렬 로직 시작 ---
+        IEnumerable<QuerySortOrder> sortOrders = ConvertToQuerySortList(requestQuery);
+        bool isFirstSort = true;
+        
+        PropertyInfo[] cachedProperties = GetCachedProperties<T>();
 
-            // Create a sort(order-by) statement by meta-information
-            List<Expression<Func<IQueryable<T>, IOrderedQueryable<T>>>> sortConditions = CreateSortOrders<T>(requestQuery);
-            
-            // Adds conditions to the queryable.
-            if(sortConditions.Count > 0)
-                queryable = sortConditions.Aggregate(queryable, (current, sortOrder) => sortOrder.Compile()(current));
-            
-            return queryable;
-        }
-        catch (Exception e)
+        foreach (QuerySortOrder sortOrder in sortOrders)
         {
-            logger.LogError(e, e.Message);
-            return null;
+            // 1. 정렬할 속성 정보(PropertyInfo)를 가져옵니다.
+            PropertyInfo? propertyInfo = cachedProperties
+                .FirstOrDefault(p => p.Name.Equals(sortOrder.Field, StringComparison.OrdinalIgnoreCase));
+
+            if (propertyInfo == null)
+                continue;
+
+            // 2. 파라미터 표현식(x)을 생성합니다.
+            ParameterExpression parameter = Expression.Parameter(typeof(T), "x");
+            // 3. 속성 접근 표현식(x.PropertyName)을 생성합니다.
+            MemberExpression propertyAccess = Expression.Property(parameter, propertyInfo);
+            // 4. 속성의 실제 타입을 사용한 람다 표현식(x => x.PropertyName)을 생성합니다.
+            LambdaExpression orderByExpression = Expression.Lambda(propertyAccess, parameter);
+
+            // 5. 정렬 메서드 이름(OrderBy, OrderByDescending, ThenBy, ThenByDescending)을 결정합니다.
+            string methodName;
+            if (isFirstSort)
+            {
+                methodName = sortOrder.Order == EnumQuerySortOrder.Asc ? "OrderBy" : "OrderByDescending";
+                isFirstSort = false;
+            }
+            else
+            {
+                methodName = sortOrder.Order == EnumQuerySortOrder.Asc ? "ThenBy" : "ThenByDescending";
+            }
+
+            // 6. 리플렉션을 사용해 올바른 타입의 제네릭 정렬 메서드 호출 표현식을 생성합니다.
+            MethodCallExpression resultExpression = Expression.Call(
+                typeof(Queryable),
+                methodName,
+                [typeof(T), propertyInfo.PropertyType], // 제네릭 타입 인자: <TEntity, TPropertyType>
+                queryable.Expression,
+                Expression.Quote(orderByExpression)
+            );
+
+            // 7. 정렬이 적용된 새로운 IQueryable을 생성하여 기존 queryable을 대체합니다.
+            queryable = queryable.Provider.CreateQuery<T>(resultExpression);
         }
+        // --- 수정된 정렬 로직 끝 ---
+
+        return queryable;
     }
+    catch (Exception e)
+    {
+        logger.LogError(e, e.Message);
+        return null;
+    }
+}
+
 
     /// <summary>
     /// Converts the filter and search criteria from a RequestQuery into a list of QuerySearch objects.
@@ -459,19 +500,19 @@ public class QueryBuilder<TDbContext>(
     /// </summary>
     /// <typeparam name="T">Entity Type</typeparam>
     /// <param name="requestQuery">requestQuery</param>
-    private List<Expression<Func<IQueryable<T>, IOrderedQueryable<T>>>> CreateSortOrders<T>(RequestQuery requestQuery) 
-        where T : class
-    {
-        List<Expression<Func<IQueryable<T>, IOrderedQueryable<T>>>> orders = new List<Expression<Func<IQueryable<T>, IOrderedQueryable<T>>>>();
-        IEnumerable<QuerySortOrder> sortOrders = ConvertToQuerySortList(requestQuery);
-        foreach (QuerySortOrder sortOrder in sortOrders)
-        {
-            Expression<Func<IQueryable<T>, IOrderedQueryable<T>>>? orderExpression = CreateSingleSortExpression<T>(sortOrder);
-            if (orderExpression != null)
-                orders.Add(orderExpression);                      
-        }
-        return orders;
-    }
+    // private List<Expression<Func<T, object>>> CreateSortOrders<T>(RequestQuery requestQuery) 
+    //     where T : class
+    // {
+    //     List<Expression<Func<T, object>>> orders = new List<Expression<Func<T, object>>>();
+    //     IEnumerable<QuerySortOrder> sortOrders = ConvertToQuerySortList(requestQuery);
+    //     foreach (QuerySortOrder sortOrder in sortOrders)
+    //     {
+    //         Expression<Func<T, object>>? orderExpression = CreateSingleSortExpression<T>(sortOrder);
+    //         if (orderExpression != null)
+    //             orders.Add(orderExpression);                      
+    //     }
+    //     return orders;
+    // }
 
     /// <summary>
     /// Creates a single sort expression based on the provided sort order.
@@ -479,46 +520,62 @@ public class QueryBuilder<TDbContext>(
     /// <typeparam name="T">The type of the entity being sorted.</typeparam>
     /// <param name="sortOrder">The sort order that specifies the field and the direction for sorting.</param>
     /// <returns>An Expression that represents the sort operation or null if the property is not found or an error occurs.</returns>
-    private Expression<Func<IQueryable<T>, IOrderedQueryable<T>>>? CreateSingleSortExpression<T>(
-        QuerySortOrder sortOrder) where T : class
-    {
-        try
-        {
-            // Get Entity Type
-            Type entityType = typeof(T);
-            
-            // Get PropertyInfo
-            PropertyInfo? propertyInfo = GetCachedProperties<T>()
-                .FirstOrDefault(i => i.Name.Equals(sortOrder.Field, StringComparison.OrdinalIgnoreCase));
-            
-            if (propertyInfo == null)
-                return null;
-            
-            ParameterExpression queryParameter = Expression.Parameter(typeof(IQueryable<T>), "q");
-            ParameterExpression entityParameter = Expression.Parameter(entityType, "x");
-            MemberExpression property = Expression.Property(entityParameter, propertyInfo);
-            LambdaExpression propertyAccessLambda = Expression.Lambda(property, entityParameter);
-
-            typeof(Queryable).GetMethods().First(
-                method => method.Name == (sortOrder.Order == EnumQuerySortOrder.Asc ? "OrderBy" : "OrderByDescending") &&
-                          method.GetParameters().Length == 2).MakeGenericMethod(entityType, propertyInfo.PropertyType);
-
-            MethodCallExpression orderByExpression = Expression.Call(
-                typeof(Queryable),
-                sortOrder.Order == EnumQuerySortOrder.Asc ? "OrderBy" : "OrderByDescending",
-                [ entityType, propertyInfo.PropertyType ],
-                queryParameter,
-                propertyAccessLambda);
-
-            return Expression.Lambda<Func<IQueryable<T>, IOrderedQueryable<T>>>(orderByExpression, queryParameter);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e, e.Message);
-            return null;
-        }
-    }
-    
+    // private Expression<Func<T, object>>? CreateSingleSortExpression<T>(
+    //     QuerySortOrder sortOrder) where T : class
+    // {
+    //     try
+    //     {
+    //         // Get Entity Type
+    //         Type entityType = typeof(T);
+    //         
+    //         // Get PropertyInfo
+    //         PropertyInfo? propertyInfo = GetCachedProperties<T>()
+    //             .FirstOrDefault(i => i.Name.Equals(sortOrder.Field, StringComparison.OrdinalIgnoreCase));
+    //         
+    //         if (propertyInfo == null)
+    //             return null;
+    //         
+    //         // Create parameter expression: x => x.Property
+    //         ParameterExpression entityParameter = Expression.Parameter(typeof(T), "x");
+    //         MemberExpression property = Expression.Property(entityParameter, propertyInfo);
+    //
+    //         
+    //         // typeof(Queryable).GetMethods().First(
+    //         //     method => method.Name == (sortOrder.Order == EnumQuerySortOrder.Asc ? "OrderBy" : "OrderByDescending") &&
+    //         //               method.GetParameters().Length == 2).MakeGenericMethod(entityType, propertyInfo.PropertyType);
+    //   
+    //         // Convert to object for generic handling
+    //         UnaryExpression convertToObject = Expression.Convert(property, typeof(object));
+    //         
+    //         return Expression.Lambda<Func<T, object>>(convertToObject, entityParameter);
+    //         
+    //         
+    //         //
+    //         // ParameterExpression queryParameter = Expression.Parameter(typeof(IQueryable<T>), "q");
+    //         // ParameterExpression entityParameter = Expression.Parameter(entityType, "x");
+    //         // MemberExpression property = Expression.Property(entityParameter, propertyInfo);
+    //         // LambdaExpression propertyAccessLambda = Expression.Lambda(property, entityParameter);
+    //         //
+    //         // typeof(Queryable).GetMethods().First(
+    //         //     method => method.Name == (sortOrder.Order == EnumQuerySortOrder.Asc ? "OrderBy" : "OrderByDescending") &&
+    //         //               method.GetParameters().Length == 2).MakeGenericMethod(entityType, propertyInfo.PropertyType);
+    //         //
+    //         // MethodCallExpression orderByExpression = Expression.Call(
+    //         //     typeof(Queryable),
+    //         //     sortOrder.Order == EnumQuerySortOrder.Asc ? "OrderBy" : "OrderByDescending",
+    //         //     [ entityType, propertyInfo.PropertyType ],
+    //         //     queryParameter,
+    //         //     propertyAccessLambda);
+    //         //
+    //         // return Expression.Lambda<Func<IQueryable<T>, IOrderedQueryable<T>>>(orderByExpression, queryParameter);
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         logger.LogError(e, e.Message);
+    //         return null;
+    //     }
+    // }
+    //
     
     /// <summary>
     /// ConvertToQuerySortList

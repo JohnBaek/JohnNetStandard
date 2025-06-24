@@ -28,7 +28,6 @@ public static class QuerySearchMapper
     {
         return _searchMetaCache.GetOrAdd(typeof(T), _ =>
         {
-
             List<RequestQuerySearchMeta> searchMetas = [];
             List<PropertyInfo> properties = typeof(T).GetProperties().ToList();
 

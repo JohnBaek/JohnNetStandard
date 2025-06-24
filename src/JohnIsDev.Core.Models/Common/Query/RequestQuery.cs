@@ -133,6 +133,19 @@ public class RequestQuery
     }
 
     /// <summary>
+    /// Adds a list of search and sort metadata to the current query, replacing any existing metadata.
+    /// </summary>
+    /// <param name="searchMetas">The list of SearchMeta objects that define the search and sort criteria.</param>
+    /// <returns>The updated RequestQuery instance.</returns>
+    public RequestQuery AddSearchAndSortDefineRanges(List<RequestQuerySearchMeta> searchMetas)
+    {
+        SearchMetas.Clear();
+        SearchMetas.AddRange(searchMetas);
+        return this;       
+    }
+    
+
+    /// <summary>
     /// 메타 정보를 추가한다.
     /// </summary>
     /// <param name="searchType"></param>
