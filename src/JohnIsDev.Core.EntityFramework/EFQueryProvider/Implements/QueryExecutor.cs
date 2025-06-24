@@ -52,9 +52,42 @@ public class QueryExecutor<TDbContext>(
             };
         }
     }
-    
-    
-    
+
+    /// <summary>
+    /// Executes the specified query asynchronously and returns a paginated response containing the results.
+    /// </summary>
+    /// <param name="queryable">The queryable object representing the database query to execute.</param>
+    /// <param name="requestQuery">An object containing pagination parameters such as skip and page count.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="ResponseList{TDbContext}"/> with the query results and pagination details.</returns>
+    public async Task<ResponseList<TEntity>> ExecuteAsync<TEntity>(IQueryable<TEntity> queryable,
+        RequestQuery requestQuery) where TEntity : class
+    {
+        try
+        {
+            // Select a total count
+            int totalCount = await queryable.AsNoTracking().CountAsync();
+            
+            // Select a paged list
+            List<TEntity> items = await queryable.AsNoTracking()
+                .Skip(requestQuery.Skip)
+                .Take(requestQuery.PageCount)
+                .ToListAsync();
+            
+            return new ResponseList<TEntity>(EnumResponseResult.Success, "", "", items)
+            {
+                TotalCount = totalCount ,
+                Skip = requestQuery.Skip ,
+                PageCount = requestQuery.PageCount 
+            };
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return new ResponseList<TEntity>(EnumResponseResult.Error, "COMMON_DATABASE_ERROR","", []);
+        }
+    }
+
+
     /// <summary>
     /// Converts a queryable source into a paginated response list based on the specified request query.
     /// </summary>

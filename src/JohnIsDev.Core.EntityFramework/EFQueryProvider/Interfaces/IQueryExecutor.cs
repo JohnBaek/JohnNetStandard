@@ -20,6 +20,18 @@ public interface IQueryExecutor<TDbContext> where TDbContext : DbContext
         Func<TDbContext, Task<TResponse>> operation)
         where TResponse : Response, new();
 
+
+    /// <summary>
+    /// Executes a query operation with the provided queryable source and request query parameters,
+    /// and returns a paginated list of items wrapped in a response.
+    /// </summary>
+    /// <param name="queryable">The queryable source of data to be executed.</param>
+    /// <param name="requestQuery">The request query containing pagination and filtering options.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="ResponseList{TDbContext}"/>
+    /// with the result of the query.</returns>
+    Task<ResponseList<TEntity>> ExecuteAsync<TEntity>(IQueryable<TEntity> queryable, RequestQuery requestQuery) where TEntity : class;
+
+
     /// <summary>
     /// Converts the provided queryable into a paginated response list based on the request query parameters.
     /// </summary>
