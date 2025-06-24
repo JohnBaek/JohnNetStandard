@@ -16,7 +16,7 @@ public interface IQueryExecutor<TDbContext> where TDbContext : DbContext
     /// <typeparam name="TResponse">The type of the response that extends the <see cref="Response"/> class.</typeparam>
     /// <param name="operation">The operation to execute within the transaction. This is a function that returns a task of type <typeparamref name="TResponse"/>.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the response of type <typeparamref name="TResponse"/>.</returns>
-    Task<TResponse> ExecuteWithTransactionAsync<TResponse>(
+    Task<TResponse> ExecuteWithTransactionAutoCommitAsync<TResponse>(
         Func<TDbContext, Task<TResponse>> operation)
         where TResponse : Response, new();
 

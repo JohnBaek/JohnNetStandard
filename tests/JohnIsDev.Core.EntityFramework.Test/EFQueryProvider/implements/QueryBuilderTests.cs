@@ -69,7 +69,7 @@ public class QueryExecutorTests : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Tests that <see cref="QueryExecutor{TDbContext}.ExecuteWithTransactionAsync{TResponse}"/>
+    /// Tests that <see cref="QueryExecutor{TDbContext}.ExecuteWithTransactionAutoCommitAsync{TResponse}"/>
     /// commits database changes when the operation completes successfully.
     /// </summary>
     /// <returns>
@@ -85,7 +85,7 @@ public class QueryExecutorTests : IDisposable, IAsyncDisposable
         var testUser = _userFaker.Generate();
 
         // Act
-        var response = await _queryExecutor.ExecuteWithTransactionAsync<Response>(async dbContext =>
+        var response = await _queryExecutor.ExecuteWithTransactionAutoCommitAsync<Response>(async dbContext =>
         {
             await dbContext.Users.AddAsync(testUser);
             await dbContext.SaveChangesAsync();
@@ -102,7 +102,7 @@ public class QueryExecutorTests : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Tests that <see cref="QueryExecutor{TDbContext}.ExecuteWithTransactionAsync{TResponse}"/>
+    /// Tests that <see cref="QueryExecutor{TDbContext}.ExecuteWithTransactionAutoCommitAsync{TResponse}"/>
     /// rolls back database changes when an exception occurs during the operation.
     /// </summary>
     /// <returns>
@@ -118,7 +118,7 @@ public class QueryExecutorTests : IDisposable, IAsyncDisposable
         var testUser = _userFaker.Generate();
     
         // Act
-        var response = await _queryExecutor.ExecuteWithTransactionAsync<Response>(async dbContext =>
+        var response = await _queryExecutor.ExecuteWithTransactionAutoCommitAsync<Response>(async dbContext =>
         {
             await dbContext.Users.AddAsync(testUser);
             await dbContext.SaveChangesAsync();

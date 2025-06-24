@@ -26,7 +26,7 @@ public class QueryExecutor<TDbContext>(
     /// <typeparam name="TResponse">The type of the response that the operation generates, which must inherit from Response and have a parameterless constructor.</typeparam>
     /// <param name="operation">A function that contains the operation to be executed within a transaction. The function takes an instance of <typeparamref name="TDbContext"/> as input and produces a <typeparamref name="TResponse"/> as output.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the response of the operation. If the operation fails, the response contains error details.</returns>
-    public async Task<TResponse> ExecuteWithTransactionAsync<TResponse>(Func<TDbContext, Task<TResponse>> operation)
+    public async Task<TResponse> ExecuteWithTransactionAutoCommitAsync<TResponse>(Func<TDbContext, Task<TResponse>> operation)
         where TResponse : Response, new()
     {
         // Creates a DbContext
