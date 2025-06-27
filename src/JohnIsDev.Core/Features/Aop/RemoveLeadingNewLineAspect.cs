@@ -14,6 +14,7 @@ public class RemoveLeadingNewLineAspect : AbstractInterceptorAttribute
     /// </summary>
     private readonly ILogger<RemoveLeadingNewLineAspect> _logger;
 
+    
     /// <summary>
     /// Constructor
     /// </summary>
