@@ -67,7 +67,7 @@ public class ResponseList<T> : Response
     /// </summary>
     /// <typeparam name="TConvert">The target type to convert the items in the list to.</typeparam>
     /// <returns>A new instance of <see cref="ResponseList{TConvert}"/> with converted items and copied metadata.</returns>
-    public ResponseList<TConvert> ToConvert<TConvert>() where TConvert : class
+    public ResponseList<TConvert> ToConvert<TConvert>() where TConvert : class, new()
     {
         return new ResponseList<TConvert>
         {

@@ -70,7 +70,7 @@ public class ResponseData<T> : Response
     /// </summary>
     /// <typeparam name="TConvert">The type to convert the data to.</typeparam>
     /// <returns>A new ResponseData object with the converted data.</returns>
-    public ResponseData<TConvert> ToConvert<TConvert>() where TConvert : class
+    public ResponseData<TConvert> ToConvert<TConvert>() where TConvert : class, new()
     {
         return new ResponseData<TConvert>
         {
