@@ -9,6 +9,7 @@ namespace JohnIsDev.Core.Features.Aop;
 /// </summary>
 public class RemoveLeadingNewLineAspect : AbstractInterceptorAttribute
 {
+    
     /// <summary>
     /// Logger
     /// </summary>
