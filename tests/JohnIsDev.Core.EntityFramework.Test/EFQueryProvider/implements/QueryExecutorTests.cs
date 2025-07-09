@@ -109,6 +109,7 @@ public class QueryBuilderTests : IDisposable, IAsyncDisposable
             PageCount = 100
         };
         
+        
         // Act
         IQueryable<TestUser>? queryable = _queryBuilder.BuildQuery<TestUser>(requestQuery);
         
