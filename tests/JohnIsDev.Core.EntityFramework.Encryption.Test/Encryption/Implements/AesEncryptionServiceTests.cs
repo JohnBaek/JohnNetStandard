@@ -157,5 +157,6 @@ public class AesEncryptionServiceTests
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)),
             Times.Once);
+        
     }
 }
