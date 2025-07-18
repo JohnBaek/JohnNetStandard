@@ -7,8 +7,6 @@ namespace JohnIsDev.Core.EntityFramework.Encryption.Encryption.Interfaces;
 /// </summary>
 public interface IEncryptionService
 {
-    
-    
     /// <summary>
     /// Encrypts the specified plaintext value and returns the encrypted result.
     /// </summary>
