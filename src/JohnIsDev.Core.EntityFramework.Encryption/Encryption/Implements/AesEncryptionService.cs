@@ -128,4 +128,85 @@ public class AesEncryptionService : IEncryptionService
             return "";
         }
     }
+
+    /// <summary>
+    /// Encrypts a plaintext string using AES encryption.
+    /// </summary>
+    /// <param name="value">The plaintext value to be encrypted.</param>
+    /// <returns>The encrypted string prefixed with an identifier, or the original value if it is null, empty,
+    /// already encrypted, or an error occurs during encryption.</returns>
+    public string Encrypt(string value)
+    {
+        try
+        {
+            // Returns original text If it has no value
+            if(string.IsNullOrWhiteSpace(value))
+                return value;
+            
+            // Checks If its value has encrypted already 
+            // Checks with prefix
+            if (value.StartsWith(_prefix))
+                return value;
+            
+            using Aes aes = Aes.Create();
+            
+            // Sets encryption objects
+            aes.Key = _key;
+            aes.IV = _iv;
+            
+            ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+            using MemoryStream memoryStream = new();
+            
+            using CryptoStream cryptoStream = new (memoryStream, encryptor, CryptoStreamMode.Write);
+            using (StreamWriter streamWriter = new StreamWriter(cryptoStream))
+                streamWriter.Write(value);
+            
+            string ciphertext = Convert.ToBase64String(memoryStream.ToArray());
+            return $"{_prefix}{ciphertext}";
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
+            return "";
+        }
+    }
+
+    /// <summary>
+    /// Decrypts the provided cipher text using AES decryption and returns the original text.
+    /// If the input is null, empty, or not prefixed, the original input is returned unchanged.
+    /// </summary>
+    /// <param name="cipherText">The encrypted text to be decrypted.</param>
+    /// <returns>The decrypted original text, or the input unchanged if it does not meet decryption conditions.</returns>
+    public string Decrypt(string cipherText)
+    {
+        try
+        {
+            // Returns original text If it has no value
+            if(string.IsNullOrWhiteSpace(cipherText))
+                return cipherText;
+            
+            // Returns original Text If it Has no Prefix due to it would be normal text 
+            if (!cipherText.StartsWith(_prefix))
+                return cipherText;
+            
+            byte[] cipherTextWithoutPrefixBytes = Convert.FromBase64String(cipherText.Substring(_prefix.Length)); 
+            using Aes aes = Aes.Create();
+            
+            // Sets encryption objects
+            aes.Key = _key;
+            aes.IV = _iv;
+            
+            ICryptoTransform decrypt = aes.CreateDecryptor(aes.Key, aes.IV);
+            using MemoryStream memoryStream = new MemoryStream(cipherTextWithoutPrefixBytes);
+            using CryptoStream cryptoStream = new CryptoStream(memoryStream, decrypt, CryptoStreamMode.Read);
+            using StreamReader streamReader = new StreamReader(cryptoStream);
+
+            return streamReader.ReadToEnd();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
+            return "";
+        }
+    }
 }
