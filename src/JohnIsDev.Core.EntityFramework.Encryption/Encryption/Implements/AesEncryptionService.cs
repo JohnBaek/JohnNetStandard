@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using JohnIsDev.Core.EntityFramework.Encryption.Attributes;
 using JohnIsDev.Core.EntityFramework.Encryption.Encryption.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
