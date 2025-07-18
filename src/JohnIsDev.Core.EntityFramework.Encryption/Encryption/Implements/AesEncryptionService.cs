@@ -76,9 +76,10 @@ public class AesEncryptionService : IEncryptionService
             
             ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
             using MemoryStream memoryStream = new();
+            
             await using CryptoStream cryptoStream = new (memoryStream, encryptor, CryptoStreamMode.Write);
-            await using StreamWriter streamWriter = new StreamWriter(cryptoStream);
-            await streamWriter.WriteAsync(value);
+            await using (StreamWriter streamWriter = new StreamWriter(cryptoStream))
+                await streamWriter.WriteAsync(value);
             
             string ciphertext = Convert.ToBase64String(memoryStream.ToArray());
             return $"{_prefix}{ciphertext}";
@@ -116,7 +117,7 @@ public class AesEncryptionService : IEncryptionService
             
             ICryptoTransform decrypt = aes.CreateDecryptor(aes.Key, aes.IV);
             using MemoryStream memoryStream = new MemoryStream(cipherTextWithoutPrefixBytes);
-            await using CryptoStream cryptoStream = new CryptoStream(memoryStream, decrypt, CryptoStreamMode.Write);
+            await using CryptoStream cryptoStream = new CryptoStream(memoryStream, decrypt, CryptoStreamMode.Read);
             using StreamReader streamReader = new StreamReader(cryptoStream);
 
             return await streamReader.ReadToEndAsync();
