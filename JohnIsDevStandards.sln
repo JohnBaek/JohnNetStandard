@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JohnIsDev.Core.Test", "test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JohnIsDev.Core.EntityFramework.Encryption", "src\JohnIsDev.Core.EntityFramework.Encryption\JohnIsDev.Core.EntityFramework.Encryption.csproj", "{DBC4F76C-5FE5-472C-90B3-B03859F53BE1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JohnIsDev.Core.EntityFramework.Encryption.Test", "tests\JohnIsDev.Core.EntityFramework.Encryption.Test\JohnIsDev.Core.EntityFramework.Encryption.Test.csproj", "{1720D8FE-82C3-4834-99B0-1DC2E89C2280}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +54,10 @@ Global
 		{DBC4F76C-5FE5-472C-90B3-B03859F53BE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBC4F76C-5FE5-472C-90B3-B03859F53BE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBC4F76C-5FE5-472C-90B3-B03859F53BE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1720D8FE-82C3-4834-99B0-1DC2E89C2280}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1720D8FE-82C3-4834-99B0-1DC2E89C2280}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1720D8FE-82C3-4834-99B0-1DC2E89C2280}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1720D8FE-82C3-4834-99B0-1DC2E89C2280}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A314EE00-399E-4292-856F-8AC32141429B} = {FE852A7B-CF6B-4ACD-8B8B-469C47E77060}
@@ -61,5 +67,6 @@ Global
 		{457F7361-E007-46DB-8751-840ED0B54309} = {FE852A7B-CF6B-4ACD-8B8B-469C47E77060}
 		{6E89B726-8EBF-4F2D-B2A5-5CA9701CF143} = {D12EFB95-9A6E-418C-B0C3-BE6B3D3ED823}
 		{DBC4F76C-5FE5-472C-90B3-B03859F53BE1} = {FE852A7B-CF6B-4ACD-8B8B-469C47E77060}
+		{1720D8FE-82C3-4834-99B0-1DC2E89C2280} = {D12EFB95-9A6E-418C-B0C3-BE6B3D3ED823}
 	EndGlobalSection
 EndGlobal
