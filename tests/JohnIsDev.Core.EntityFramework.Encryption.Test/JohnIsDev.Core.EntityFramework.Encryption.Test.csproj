@@ -26,4 +26,8 @@
       <ProjectReference Include="..\..\src\JohnIsDev.Core.EntityFramework.Encryption\JohnIsDev.Core.EntityFramework.Encryption.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Encryption\" />
+    </ItemGroup>
+
 </Project>

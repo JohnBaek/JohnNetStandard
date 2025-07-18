@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace JohnIsDev.Core.EntityFramework.Encryption.Test.Implements;
+namespace JohnIsDev.Core.EntityFramework.Encryption.Test.Encryption.Implements;
 
 /// <summary>
 /// Provides encryption and decryption functionalities using the AES (Advanced Encryption Standard) algorithm.
