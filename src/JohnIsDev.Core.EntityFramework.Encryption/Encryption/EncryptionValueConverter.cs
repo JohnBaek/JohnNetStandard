@@ -16,6 +16,7 @@ namespace JohnIsDev.Core.EntityFramework.Encryption.Encryption;
 /// </remarks>
 public class EncryptionValueConverter : ValueConverter<string, string>
 {
+    
     /// <summary>
     /// A value converter class used for encrypting and decrypting string values
     /// in the context of Entity Framework Core.
