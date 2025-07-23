@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Version>9.0.13</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\JohnIsDev.Core.Extensions\JohnIsDev.Core.Extensions.csproj" />
+    </ItemGroup>
+
+</Project>

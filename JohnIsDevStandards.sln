@@ -1,0 +1,79 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FE852A7B-CF6B-4ACD-8B8B-469C47E77060}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D12EFB95-9A6E-418C-B0C3-BE6B3D3ED823}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JohnIsDev.Core", "src\JohnIsDev.Core\JohnIsDev.Core.csproj", "{A314EE00-399E-4292-856F-8AC32141429B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JohnIsDev.Core.EntityFramework", "src\JohnIsDev.Core.EntityFramework\JohnIsDev.Core.EntityFramework.csproj", "{DCD4D561-E1D5-4DFE-AA21-E54BE4579F96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JohnIsDev.Core.Models", "src\JohnIsDev.Core.Models\JohnIsDev.Core.Models.csproj", "{1E601FB4-0E22-4280-BF83-3234CEEA5DAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JohnIsDev.Core.Extensions", "src\JohnIsDev.Core.Extensions\JohnIsDev.Core.Extensions.csproj", "{457F7361-E007-46DB-8751-840ED0B54309}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JohnIsDev.Core.EntityFramework.Encryption", "src\JohnIsDev.Core.EntityFramework.Encryption\JohnIsDev.Core.EntityFramework.Encryption.csproj", "{DBC4F76C-5FE5-472C-90B3-B03859F53BE1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JohnIsDev.Core.EntityFramework.Encryption.Test", "tests\JohnIsDev.Core.EntityFramework.Encryption.Test\JohnIsDev.Core.EntityFramework.Encryption.Test.csproj", "{AA22DDDA-2EC3-4178-ACA7-C5292DCAEF58}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JohnIsDev.Core.EntityFramework.Test", "tests\JohnIsDev.Core.EntityFramework.Test\JohnIsDev.Core.EntityFramework.Test.csproj", "{85E8D0FF-D7DE-47BE-8629-C2B49EC31D39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JohnIsDev.Core.Test", "tests\JohnIsDev.Core.Test\JohnIsDev.Core.Test.csproj", "{F6137383-7A4F-4C52-A905-9912186F6054}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JohnIsDev.Core.Mcp", "src\JohnIsDev.Core.Mcp\JohnIsDev.Core.Mcp.csproj", "{B3CC44B4-9587-4193-943E-667187CD7260}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A314EE00-399E-4292-856F-8AC32141429B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A314EE00-399E-4292-856F-8AC32141429B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A314EE00-399E-4292-856F-8AC32141429B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A314EE00-399E-4292-856F-8AC32141429B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCD4D561-E1D5-4DFE-AA21-E54BE4579F96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCD4D561-E1D5-4DFE-AA21-E54BE4579F96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCD4D561-E1D5-4DFE-AA21-E54BE4579F96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCD4D561-E1D5-4DFE-AA21-E54BE4579F96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E601FB4-0E22-4280-BF83-3234CEEA5DAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E601FB4-0E22-4280-BF83-3234CEEA5DAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E601FB4-0E22-4280-BF83-3234CEEA5DAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E601FB4-0E22-4280-BF83-3234CEEA5DAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{457F7361-E007-46DB-8751-840ED0B54309}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{457F7361-E007-46DB-8751-840ED0B54309}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{457F7361-E007-46DB-8751-840ED0B54309}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{457F7361-E007-46DB-8751-840ED0B54309}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBC4F76C-5FE5-472C-90B3-B03859F53BE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBC4F76C-5FE5-472C-90B3-B03859F53BE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBC4F76C-5FE5-472C-90B3-B03859F53BE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBC4F76C-5FE5-472C-90B3-B03859F53BE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA22DDDA-2EC3-4178-ACA7-C5292DCAEF58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA22DDDA-2EC3-4178-ACA7-C5292DCAEF58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA22DDDA-2EC3-4178-ACA7-C5292DCAEF58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA22DDDA-2EC3-4178-ACA7-C5292DCAEF58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85E8D0FF-D7DE-47BE-8629-C2B49EC31D39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85E8D0FF-D7DE-47BE-8629-C2B49EC31D39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85E8D0FF-D7DE-47BE-8629-C2B49EC31D39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85E8D0FF-D7DE-47BE-8629-C2B49EC31D39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6137383-7A4F-4C52-A905-9912186F6054}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6137383-7A4F-4C52-A905-9912186F6054}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6137383-7A4F-4C52-A905-9912186F6054}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6137383-7A4F-4C52-A905-9912186F6054}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3CC44B4-9587-4193-943E-667187CD7260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3CC44B4-9587-4193-943E-667187CD7260}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3CC44B4-9587-4193-943E-667187CD7260}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3CC44B4-9587-4193-943E-667187CD7260}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A314EE00-399E-4292-856F-8AC32141429B} = {FE852A7B-CF6B-4ACD-8B8B-469C47E77060}
+		{DCD4D561-E1D5-4DFE-AA21-E54BE4579F96} = {FE852A7B-CF6B-4ACD-8B8B-469C47E77060}
+		{1E601FB4-0E22-4280-BF83-3234CEEA5DAF} = {FE852A7B-CF6B-4ACD-8B8B-469C47E77060}
+		{457F7361-E007-46DB-8751-840ED0B54309} = {FE852A7B-CF6B-4ACD-8B8B-469C47E77060}
+		{DBC4F76C-5FE5-472C-90B3-B03859F53BE1} = {FE852A7B-CF6B-4ACD-8B8B-469C47E77060}
+		{AA22DDDA-2EC3-4178-ACA7-C5292DCAEF58} = {D12EFB95-9A6E-418C-B0C3-BE6B3D3ED823}
+		{85E8D0FF-D7DE-47BE-8629-C2B49EC31D39} = {D12EFB95-9A6E-418C-B0C3-BE6B3D3ED823}
+		{F6137383-7A4F-4C52-A905-9912186F6054} = {D12EFB95-9A6E-418C-B0C3-BE6B3D3ED823}
+		{B3CC44B4-9587-4193-943E-667187CD7260} = {FE852A7B-CF6B-4ACD-8B8B-469C47E77060}
+	EndGlobalSection
+EndGlobal
