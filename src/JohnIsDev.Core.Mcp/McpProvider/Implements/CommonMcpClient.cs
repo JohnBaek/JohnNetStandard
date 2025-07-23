@@ -13,7 +13,7 @@ namespace JohnIsDev.Core.Mcp.McpProvider.Implements;
 /// </summary>
 public class CommonMcpClient : IMcpClient
 {
-    /// <summary>
+    /// <summary> 
     /// Gets or sets the provider associated with the MCP client.
     /// The provider defines the service endpoint or configuration for
     /// interacting with the MCP services.
