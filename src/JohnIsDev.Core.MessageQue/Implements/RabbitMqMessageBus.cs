@@ -14,28 +14,54 @@ namespace JohnIsDev.Core.MessageQue.Implements;
 /// The RabbitMqMessageBus class provides functionality for managing and interacting with a message queue
 /// using RabbitMQ. It serves as a message bus implementation to enable communication between different
 /// parts of the application or distributed system.
+/// Should be singleton
 /// </summary>
 public class RabbitMqMessageBus : IMessageBus
 {
     /// <summary>
-    /// 
+    /// Represents the logging mechanism used to capture, record, and output diagnostic or operational
+    /// information for the <see cref="RabbitMqMessageBus"/>. This variable is of type
+    /// <see cref="ILogger{RabbitMqMessageBus}"/> and is utilized to log messages such as errors,
+    /// warnings, or informational details during the operation of the message bus,
+    /// including publishing and subscribing to messages.
     /// </summary>
     private readonly ILogger<RabbitMqMessageBus> _logger;
-    
+
     /// <summary>
-    /// 
+    /// Represents the connection interface to the RabbitMQ server. This variable is of type
+    /// <see cref="IConnection"/> and is used by the <see cref="RabbitMqMessageBus"/> to establish
+    /// and manage communication with the RabbitMQ message broker, including creating channels,
+    /// publishing messages, and subscribing to queues. The connection is intended to persist
+    /// throughout the lifecycle of the <see cref="RabbitMqMessageBus"/> to avoid the overhead
+    /// of repeatedly opening and closing connections.
     /// </summary>
     private readonly IConnection _connection;
-    
+
     /// <summary>
-    /// 
+    /// Represents the configuration settings required to establish a connection and interact
+    /// with the RabbitMQ message broker. This includes configuration options such as the host name,
+    /// port, user credentials, virtual host, and exchange type. This variable is of type
+    /// <see cref="RabbitMqConfig"/> and is used internally by the <see cref="RabbitMqMessageBus"/>
+    /// to configure its connection to RabbitMQ.
     /// </summary>
     private readonly RabbitMqConfig _config;
 
     /// <summary>
-    /// 
+    /// Maintains a collection of subscribed channels represented by <see cref="IChannel"/> instances
+    /// that are utilized for managing and processing message subscriptions within the RabbitMQ message
+    /// bus system. This list is used to track active subscription channels and ensure proper handling
+    /// of incoming messages for various topics and routing keys.
     /// </summary>
-    private IChannel _channel;
+    private readonly List<IChannel> _subscribeChannels = [];
+
+    /// <summary>
+    /// Represents a collection of asynchronous event-based consumers, specifically of type
+    /// <see cref="AsyncEventingBasicConsumer"/>. These consumers are responsible for receiving
+    /// and processing messages from RabbitMQ. The collection is utilized to manage and coordinate
+    /// multiple consumers within the scope of the message bus, enabling subscriptions to various
+    /// message queues and topics.
+    /// </summary>
+    private readonly List<AsyncEventingBasicConsumer> _consumers = [];
     
     /// <summary>
     /// 
@@ -52,19 +78,22 @@ public class RabbitMqMessageBus : IMessageBus
 
 
     /// <summary>
-    /// 
+    /// Publishes a message to a specified topic and routing key in the RabbitMQ exchange. This method allows
+    /// sending messages to RabbitMQ with a defined exchange type and routing key.
     /// </summary>
-    /// <param name="topic"></param>
-    /// <param name="routingKey"></param>
-    /// <param name="exchangeType"></param>
-    /// <param name="message"></param>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The type of the message to be published.</typeparam>
+    /// <param name="topic">The topic or exchange name where the message will be published.</param>
+    /// <param name="routingKey">The routing key that determines how the message will be routed.</param>
+    /// <param name="exchangeType">The type of the RabbitMQ exchange (e.g., direct, fanout, topic).</param>
+    /// <param name="message">The message payload to be published.</param>
+    /// <returns>A Task that represents the asynchronous operation for message publishing.</returns>
     public async Task PublishAsync<T>(string topic, string routingKey, string exchangeType, T message)
     {
         try
         {
-            IChannel channel = await _connection.CreateChannelAsync();
-            
+            // Create Chanel
+            await using IChannel channel = await _connection.CreateChannelAsync();
+
             // Declare an exchange 
             await channel.ExchangeDeclareAsync(topic, exchangeType, durable: true, autoDelete: false);
 
@@ -84,7 +113,6 @@ public class RabbitMqMessageBus : IMessageBus
         }
     }
 
-
     /// <summary>
     /// Subscribes to a specified topic and routing key in the message queue and processes messages using
     /// the provided message handler function. The subscription requires specifying the topic, routing key,
@@ -102,7 +130,11 @@ public class RabbitMqMessageBus : IMessageBus
     {
         try
         {
-            await using IChannel channel = await _connection.CreateChannelAsync();
+            IChannel channel = await _connection.CreateChannelAsync();
+            
+            // To store in memory implicitly to avoid GC
+            _subscribeChannels.Add(channel);
+            
             // Declare an exchange 
             await channel.ExchangeDeclareAsync(topic, exchangeType, durable: true, autoDelete: false);
             string queueName = $"{topic}_{typeof(T).Name}";
@@ -111,8 +143,10 @@ public class RabbitMqMessageBus : IMessageBus
             await channel.QueueDeclareAsync(queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
             await channel.QueueBindAsync(queueName, topic, routingKey);
 
-            // Prepare a consumer
+            // Declare consumer and add memory 
             AsyncEventingBasicConsumer consumer = new AsyncEventingBasicConsumer(channel);
+            _consumers.Add(consumer);
+            
             consumer.ReceivedAsync += async (model, eventArgs) =>
             {
                 try
@@ -120,9 +154,10 @@ public class RabbitMqMessageBus : IMessageBus
                     // Gets a body 
                     byte[] body = eventArgs.Body.ToArray();
                     string jsonRaw = Encoding.UTF8.GetString(body);
-                    T message = JsonConvert.DeserializeObject<T>(jsonRaw) ;                    
+                    T? message = JsonConvert.DeserializeObject<T>(jsonRaw) ;      
+                    
                     // Get a result 
-                    bool isSuccess = await messageHandler(message);
+                    bool isSuccess = message != null && await messageHandler(message);
                     
                     if(isSuccess)
                         await channel.BasicAckAsync(eventArgs.DeliveryTag, false);
@@ -134,15 +169,37 @@ public class RabbitMqMessageBus : IMessageBus
                     _logger.LogError(e, e.Message);
                 }
             };
+            
+            // Consume
+            await channel.BasicConsumeAsync(queue: queueName , autoAck: false , consumer: consumer);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
         }
     }
-    
+
+    /// <summary>
+    /// Disposes of the resources used by the RabbitMqMessageBus instance, including the underlying RabbitMQ connection.
+    /// This method should be called to release unmanaged resources and ensure proper cleanup.
+    /// </summary>
     public void Dispose()
     {
+        // Dispose all subscriptions
+        foreach (var channel in _subscribeChannels)
+        {
+            try
+            {
+                channel?.Dispose();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error disposing subscribe channel: {Message}", e.Message);
+            }
+        }
+        
+        _subscribeChannels.Clear();
+        _consumers.Clear();
         _connection.Dispose();
     }
 }
