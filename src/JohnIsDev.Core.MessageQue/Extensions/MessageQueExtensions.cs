@@ -20,7 +20,7 @@ public static class ServiceCollectionExtensions
     /// <returns>The updated service collection.</returns>
     public static IServiceCollection AddRabbitMq(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<RabbitMqConfig>(provider =>
+        services.AddSingleton<RabbitMqConfig>(_ =>
         {
             IConfiguration config = configuration.GetSection("MessageQue:RabbitMQ");
             return new RabbitMqConfig
@@ -35,8 +35,8 @@ public static class ServiceCollectionExtensions
         // Add Connection
         services.AddSingleton<IConnection>(provider =>
         {
-            var config = provider.GetRequiredService<RabbitMqConfig>();
-            var factory = new ConnectionFactory
+            RabbitMqConfig config = provider.GetRequiredService<RabbitMqConfig>();
+            ConnectionFactory factory = new ConnectionFactory
             {
                 HostName = config.HostName,
                 Port = config.Port,
