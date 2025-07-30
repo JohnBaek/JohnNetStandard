@@ -18,6 +18,7 @@ public static class HttpClientExtension
     {
         // Prepares a Request Object
         string requestJson = JsonConvert.SerializeObject(request);
+        Console.WriteLine("requestJson");
         StringContent content = new StringContent(requestJson, System.Text.Encoding.UTF8, "application/json");
         
         // Invokes a Post request to endpoint
