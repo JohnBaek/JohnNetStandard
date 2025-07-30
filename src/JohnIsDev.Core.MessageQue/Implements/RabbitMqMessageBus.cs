@@ -99,6 +99,8 @@ public class RabbitMqMessageBus : IMessageBus
 
             // Serialize
             byte[] body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
+            
+            _logger.LogInformation($"Publish to {topic} with routingKey {routingKey} with body {body}");
 
             // Publish to MQ
             await channel.BasicPublishAsync(
@@ -146,6 +148,8 @@ public class RabbitMqMessageBus : IMessageBus
             // Declare consumer and add memory 
             AsyncEventingBasicConsumer consumer = new AsyncEventingBasicConsumer(channel);
             _consumers.Add(consumer);
+            
+            _logger.LogInformation($"Subscribe to {topic} with routingKey {routingKey} with queueName {queueName}");
             
             consumer.ReceivedAsync += async (model, eventArgs) =>
             {
