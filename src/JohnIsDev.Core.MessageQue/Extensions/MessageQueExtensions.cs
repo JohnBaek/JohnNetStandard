@@ -1,6 +1,7 @@
 using JohnIsDev.Core.MessageQue.Implements;
 using JohnIsDev.Core.MessageQue.Interfaces;
 using JohnIsDev.Core.MessageQue.Models.Configs;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
@@ -47,6 +48,36 @@ public static class ServiceCollectionExtensions
         });
         
         services.AddSingleton<IMessageBus, RabbitMqMessageBus>();
+        return services;
+    }
+
+    /// <summary>
+    /// Configures and adds MassTransit with RabbitMQ to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection to which MassTransit with RabbitMQ services will be added.</param>
+    /// <param name="configuration">The configuration object containing RabbitMQ settings.</param>
+    /// <returns>The updated service collection.</returns>
+    public static IServiceCollection AddRabbitMqMassTransit(this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddMassTransit(i =>
+        {
+            IConfiguration config = configuration.GetSection("MessageQue:RabbitMQ");
+            string hostName = config["HostName"] ?? "localhost";
+            ushort port = ushort.Parse(config["Port"] ?? "5672");
+            string userName = config["UserName"] ?? "guest";
+            string password = config["Password"] ?? "guest";
+            
+            i.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host(hostName, port, "/", hostConfigure =>
+                {
+                    hostConfigure.Username(username: userName);
+                    hostConfigure.Password(password: password);
+                });
+                cfg.ConfigureEndpoints(context);
+            });
+        });
         return services;
     }
 }
