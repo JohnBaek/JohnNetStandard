@@ -28,5 +28,5 @@ public interface IMessageBus : IDisposable
     /// <param name="messageHandler"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    Task SubscribeAsync<T>(string topic, string routingKey,string exchangeType, Func<T, Task<bool>> messageHandler);
+    Task SubscribeAsync<T>(string topic, string routingKey,string exchangeType, Func<T,string, Task<bool>> messageHandler);
 }

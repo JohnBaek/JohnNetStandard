@@ -128,7 +128,7 @@ public class RabbitMqMessageBus : IMessageBus
     /// indicating whether the message was successfully handled or not.</param>
     /// <returns>A Task representing the asynchronous operation for message subscription.</returns>
     public async Task SubscribeAsync<T>(string topic, string routingKey, string exchangeType,
-        Func<T, Task<bool>> messageHandler) 
+        Func<T, string,Task<bool>> messageHandler) 
     {
         try
         {
@@ -158,10 +158,12 @@ public class RabbitMqMessageBus : IMessageBus
                     // Gets a body 
                     byte[] body = eventArgs.Body.ToArray();
                     string jsonRaw = Encoding.UTF8.GetString(body);
-                    T? message = JsonConvert.DeserializeObject<T>(jsonRaw) ;      
+                    T? message = JsonConvert.DeserializeObject<T>(jsonRaw) ;    
+                    
+                    string actualRoutingKey = eventArgs.RoutingKey;
                     
                     // Get a result 
-                    bool isSuccess = message != null && await messageHandler(message);
+                    bool isSuccess = message != null && await messageHandler(message,actualRoutingKey);
                     
                     if(isSuccess)
                         await channel.BasicAckAsync(eventArgs.DeliveryTag, false);
