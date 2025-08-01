@@ -57,7 +57,7 @@ public class QueryExecutorTests : IDisposable, IAsyncDisposable
         _dbContextFactory = new TestDbContextFactory(_options);
 
         _mockLogger = new Mock<ILogger<QueryExecutor<TestDbContext>>>();
-        _queryExecutor = new QueryExecutor<TestDbContext>(_mockLogger.Object, _dbContextFactory);
+        _queryExecutor = new QueryExecutor<TestDbContext>(_mockLogger.Object, _dbContext);
 
         _userFaker = new Faker<TestUser>()
             .RuleFor(u => u.Id, f => f.IndexFaker++)
