@@ -59,12 +59,10 @@ public IQueryable<T>? BuildQuery<T>(RequestQuery requestQuery, IQueryable<T> que
 {
     try
     {
-        // Where 조건 생성 (기존 로직과 동일)
         List<Expression<Func<T, bool>>> whereConditions = CreateSearchConditions<T>(requestQuery);
         if (whereConditions.Count > 0)
             queryable = whereConditions.Aggregate(queryable, (current, condition) => current.Where(condition));
         
-        // --- 수정된 정렬 로직 시작 ---
         IEnumerable<QuerySortOrder> sortOrders = ConvertToQuerySortList(requestQuery);
         bool isFirstSort = true;
         
@@ -72,21 +70,16 @@ public IQueryable<T>? BuildQuery<T>(RequestQuery requestQuery, IQueryable<T> que
 
         foreach (QuerySortOrder sortOrder in sortOrders)
         {
-            // 1. 정렬할 속성 정보(PropertyInfo)를 가져옵니다.
             PropertyInfo? propertyInfo = cachedProperties
                 .FirstOrDefault(p => p.Name.Equals(sortOrder.Field, StringComparison.OrdinalIgnoreCase));
 
             if (propertyInfo == null)
                 continue;
 
-            // 2. 파라미터 표현식(x)을 생성합니다.
             ParameterExpression parameter = Expression.Parameter(typeof(T), "x");
-            // 3. 속성 접근 표현식(x.PropertyName)을 생성합니다.
             MemberExpression propertyAccess = Expression.Property(parameter, propertyInfo);
-            // 4. 속성의 실제 타입을 사용한 람다 표현식(x => x.PropertyName)을 생성합니다.
             LambdaExpression orderByExpression = Expression.Lambda(propertyAccess, parameter);
 
-            // 5. 정렬 메서드 이름(OrderBy, OrderByDescending, ThenBy, ThenByDescending)을 결정합니다.
             string methodName;
             if (isFirstSort)
             {
@@ -98,20 +91,16 @@ public IQueryable<T>? BuildQuery<T>(RequestQuery requestQuery, IQueryable<T> que
                 methodName = sortOrder.Order == EnumQuerySortOrder.Asc ? "ThenBy" : "ThenByDescending";
             }
 
-            // 6. 리플렉션을 사용해 올바른 타입의 제네릭 정렬 메서드 호출 표현식을 생성합니다.
             MethodCallExpression resultExpression = Expression.Call(
                 typeof(Queryable),
                 methodName,
-                [typeof(T), propertyInfo.PropertyType], // 제네릭 타입 인자: <TEntity, TPropertyType>
+                [typeof(T), propertyInfo.PropertyType], 
                 queryable.Expression,
                 Expression.Quote(orderByExpression)
             );
 
-            // 7. 정렬이 적용된 새로운 IQueryable을 생성하여 기존 queryable을 대체합니다.
             queryable = queryable.Provider.CreateQuery<T>(resultExpression);
         }
-        // --- 수정된 정렬 로직 끝 ---
-
         return queryable;
     }
     catch (Exception e)
