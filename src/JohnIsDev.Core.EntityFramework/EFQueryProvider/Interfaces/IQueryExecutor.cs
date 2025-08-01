@@ -29,7 +29,7 @@ public interface IQueryExecutor<TDbContext> where TDbContext : DbContext
     /// <param name="requestQuery">The request query containing pagination and filtering options.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="ResponseList{TDbContext}"/>
     /// with the result of the query.</returns>
-    Task<ResponseList<TEntity>> ExecuteAsync<TEntity>(IQueryable<TEntity> queryable, RequestQuery requestQuery) where TEntity : class;
+    Task<ResponseList<TEntity>> ExecuteAutoPaginateAsync<TEntity>(IQueryable<TEntity> queryable, RequestQuery requestQuery) where TEntity : class;
 
 
     /// <summary>

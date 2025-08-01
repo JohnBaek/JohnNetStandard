@@ -15,7 +15,7 @@ namespace JohnIsDev.Core.EntityFramework.EFQueryProvider.Implements;
 /// </summary>
 public class QueryExecutor<TDbContext>(
       ILogger<QueryExecutor<TDbContext>> logger
-    , IDbContextFactory<TDbContext> dbContextFactory) : IQueryExecutor<TDbContext>
+    ,TDbContext dbContext) : IQueryExecutor<TDbContext>
     where TDbContext : DbContext
 {
     /// <summary>
@@ -29,9 +29,6 @@ public class QueryExecutor<TDbContext>(
     public async Task<TResponse> ExecuteWithTransactionAutoCommitAsync<TResponse>(Func<TDbContext, Task<TResponse>> operation)
         where TResponse : Response, new()
     {
-        // Creates a DbContext
-        await using TDbContext dbContext = await dbContextFactory.CreateDbContextAsync();
-        
         // Begin transactions
         await using IDbContextTransaction transaction = await dbContext.Database.BeginTransactionAsync();
         try
@@ -59,7 +56,8 @@ public class QueryExecutor<TDbContext>(
     /// <param name="queryable">The queryable object representing the database query to execute.</param>
     /// <param name="requestQuery">An object containing pagination parameters such as skip and page count.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="ResponseList{TDbContext}"/> with the query results and pagination details.</returns>
-    public async Task<ResponseList<TEntity>> ExecuteAsync<TEntity>(IQueryable<TEntity> queryable,
+    public async Task<ResponseList<TEntity>> ExecuteAutoPaginateAsync<TEntity>(
+        IQueryable<TEntity> queryable,
         RequestQuery requestQuery) where TEntity : class
     {
         try
