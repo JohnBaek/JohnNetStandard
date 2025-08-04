@@ -239,7 +239,7 @@ public class RabbitMqMessageBus : IMessageBus
             _subscribeChannels.Add(channel);
             
             // Declares queue
-            string exchangeName = $"{_config.ExchangeName}.{exchangeType.ToLower()}";
+            string exchangeName = $"{_config.ExchangeName}.rpc.{exchangeType.ToLower()}";
             await channel.ExchangeDeclareAsync(exchangeName, exchangeType, durable: true, autoDelete: false);
             await channel.QueueDeclareAsync(queue: queue, durable: true, exclusive: false, autoDelete: false);
             await channel.QueueBindAsync( queue: queue, exchange: exchangeName, routingKey: routingKey);

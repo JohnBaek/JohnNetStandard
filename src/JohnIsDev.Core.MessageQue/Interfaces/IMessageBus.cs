@@ -30,25 +30,6 @@ public interface IMessageBus : IDisposable
     /// <returns></returns>
     Task SubscribeAsync<T>(string queue, string routingKey,string exchangeType, Func<T,string, Task<bool>> messageHandler);
 
-
-    // /// <summary>
-    // /// Publishes a message to the specified topic and waits for a response asynchronously.
-    // /// </summary>
-    // /// <typeparam name="TResponse">The type of the expected response.</typeparam>
-    // /// <param name="topic">The topic to which the message will be published.</param>
-    // /// <param name="routingKey">The routing key used to route the message.</param>
-    // /// <param name="exchangeType">The exchange type to be used for message publication.</param>
-    // /// <param name="request">The request message to be sent. This parameter is optional.</param>
-    // /// <param name="timeout">The time to wait for a response before timing out. Defaults to the value of <see cref="TimeSpan.Zero"/> if not specified.</param>
-    // /// <returns>A task that represents the asynchronous operation. The task result contains the response of type <typeparamref name="TResponse"/>.</returns>
-    // Task<TResponse> PublishAndWaitForResponseAsync<TResponse>(
-    //     string topic,
-    //     string routingKey,
-    //     string exchangeType,
-    //     object? request = null,
-    //     TimeSpan timeout = default);
-
-
     /// <summary>
     /// Publishes a message for Remote Procedure Call (RPC) and waits for a response asynchronously.
     /// </summary>
