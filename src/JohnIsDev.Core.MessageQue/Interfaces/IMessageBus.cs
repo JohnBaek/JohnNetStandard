@@ -54,14 +54,14 @@ public interface IMessageBus : IDisposable
     /// </summary>
     /// <typeparam name="TRequest">The type of the request message to publish.</typeparam>
     /// <typeparam name="TResponse">The type of the expected response message.</typeparam>
-    /// <param name="topic">The topic to which the message will be published.</param>
+    /// <param name="exchangeName">The topic to which the message will be published.</param>
     /// <param name="routingKey">The routing key used for routing the message.</param>
     /// <param name="exchangeType">The exchange type to be used for message publication.</param>
     /// <param name="message">The request message to be sent.</param>
     /// <param name="timeoutSec">The timeout in seconds to wait for a response before completing the operation. Default is 10 seconds.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the response message of type <typeparamref name="TResponse"/> or null if no response is received within the specified timeout.</returns>
     Task<TResponse?> PublishRpcAsync<TRequest, TResponse>(
-        string topic,
+        string exchangeName,
         string routingKey,
         string exchangeType,
         TRequest message,

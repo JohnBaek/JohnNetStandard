@@ -124,7 +124,7 @@ public class RabbitMqMessageBus : IMessageBus
     /// </summary>
     /// <typeparam name="TRequest">The type of the request message to be published.</typeparam>
     /// <typeparam name="TResponse">The type of the expected response message.</typeparam>
-    /// <param name="topic">The topic or exchange name where the request message will be published.</param>
+    /// <param name="exchangeName">The topic or exchange name where the request message will be published.</param>
     /// <param name="routingKey">The routing key that determines how the request message will be routed.</param>
     /// <param name="exchangeType">The type of the RabbitMQ exchange (e.g., direct, fanout, topic).</param>
     /// <param name="message">The request message payload to be sent as part of the RPC.</param>
@@ -132,17 +132,17 @@ public class RabbitMqMessageBus : IMessageBus
     /// <returns>A Task representing the asynchronous operation, containing the response message of type <typeparamref name="TResponse"/> if the operation succeeds, or null if no response is received.</returns>
     /// <exception cref="TimeoutException">Thrown when the RPC request does not receive a response within the specified timeout period.</exception>
     public async Task<TResponse?> PublishRpcAsync<TRequest, TResponse>(
-        string topic,
+        string exchangeName,
         string routingKey,
         string exchangeType,
         TRequest message,
-        int timeoutSec = 10)
+        int timeoutSec = 100)
     {
         TaskCompletionSource<TResponse?> taskCompletion = new TaskCompletionSource<TResponse?>();
         try
         {
             await using IChannel channel = await _connection.CreateChannelAsync();
-            await channel.ExchangeDeclareAsync(topic, exchangeType, durable: true, autoDelete: false);
+            await channel.ExchangeDeclareAsync(exchangeName, exchangeType, durable: true, autoDelete: false);
         
             // Declare a temporary queue
             QueueDeclareOk replyQueue = await channel.QueueDeclareAsync(
@@ -179,11 +179,11 @@ public class RabbitMqMessageBus : IMessageBus
             
             // Serialize message
             byte[] body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
-            _logger.LogInformation($"Publishing RPC to {topic} with CorrelationId {correlationId}");
+            _logger.LogInformation($"Publishing RPC to {exchangeName} with CorrelationId {correlationId}");
             
             // Request message publishes
             await channel.BasicPublishAsync(
-                exchange: topic,
+                exchange: exchangeName,
                 routingKey: routingKey,
                 mandatory: true,
                 basicProperties: new BasicProperties
@@ -286,7 +286,10 @@ public class RabbitMqMessageBus : IMessageBus
                     // Deserialize Response Object
                     byte[] responseBody = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response));
                     await channel.BasicPublishAsync(exchange: "", routingKey: replyTo, mandatory: true, 
-                        basicProperties: new BasicProperties(), body: responseBody);
+                        basicProperties: new BasicProperties()
+                        {
+                            CorrelationId = correlationId,
+                        }, body: responseBody);
                     
                     // Notify 
                     await channel.BasicAckAsync(eventArgs.DeliveryTag, false);
@@ -294,12 +297,11 @@ public class RabbitMqMessageBus : IMessageBus
                 catch (Exception e)
                 {
                     _logger.LogError(e, $"Error processing RPC request with CorrelationId: {correlationId}");
-                    // 처리 중 예외 발생 시 Nack (requeue=true로 설정하여 재시도 가능)
                     await channel.BasicNackAsync(eventArgs.DeliveryTag, false, true);
                 }
-                
-                await channel.BasicConsumeAsync(queue: queue, autoAck: false, consumer: consumer);
             };
+            
+            await channel.BasicConsumeAsync(queue: queue, autoAck: false, consumer: consumer);
         }
         catch (Exception e)
         {
