@@ -25,13 +25,21 @@ public class RabbitMqConfig : MessageBusConfig
     /// </summary>
     public string Password { get; set; } = "guest";
     
+    // /// <summary>
+    // /// 
+    // /// </summary>
+    // public string VirtualHost { get; set; } = "/";
+    //
+    // /// <summary>
+    // /// 
+    // /// </summary>
+    // public string ExchangeType { get; set; } = "direct";
+
+
     /// <summary>
-    /// 
+    /// Defines the name of the exchange used in the RabbitMQ messaging system.
+    /// This property specifies the exchange name that serves as a routing mechanism
+    /// to determine how messages should be distributed to queues within the broker.
     /// </summary>
-    public string VirtualHost { get; set; } = "/";
-    
-    /// <summary>
-    /// 
-    /// </summary>
-    public string ExchangeType { get; set; } = "direct";
+    public string ExchangeName { get; set; } = "test";
 }

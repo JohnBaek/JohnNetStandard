@@ -29,7 +29,8 @@ public static class ServiceCollectionExtensions
                 HostName = config["HostName"] ?? "localhost",
                 Port = int.Parse(config["Port"] ?? "5672"),
                 UserName = config["UserName"] ?? "guest",
-                Password = config["Password"] ?? "guest"
+                Password = config["Password"] ?? "guest",
+                ExchangeName = config["Exchange"] ?? "Test"
             };
         });
         
