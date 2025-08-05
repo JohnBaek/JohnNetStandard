@@ -19,14 +19,14 @@ public class QueryExecutor<TDbContext>(
     where TDbContext : DbContext
 {
     /// <summary>
-    /// Executes a specified operation within a transactional context.
-    /// Ensures transactional safety by committing if the operation succeeds,
-    /// or rolling back if an error occurs during execution.
+    /// Executes the given operation within a database transaction asynchronously. Automatically commits the transaction if no exceptions occur.
     /// </summary>
-    /// <typeparam name="TResponse">The type of the response that the operation generates, which must inherit from Response and have a parameterless constructor.</typeparam>
-    /// <param name="operation">A function that contains the operation to be executed within a transaction. The function takes an instance of <typeparamref name="TDbContext"/> as input and produces a <typeparamref name="TResponse"/> as output.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the response of the operation. If the operation fails, the response contains error details.</returns>
-    public async Task<TResponse> ExecuteWithTransactionAutoCommitAsync<TResponse>(Func<TDbContext, Task<TResponse>> operation)
+    /// <typeparam name="TResponse">The response type inheriting from <see cref="Response"/> that the operation will return.</typeparam>
+    /// <param name="operation">A function representing the database operation to execute. It receives the database context and returns a task of type <typeparamref name="TResponse"/>.</param>
+    /// <param name="autoCommit">A boolean flag indicating whether the transaction should automatically commit. The default value is true.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the response of type <typeparamref name="TResponse"/>.</returns>
+    public async Task<TResponse> ExecuteWithTransactionAutoCommitAsync<TResponse>(
+        Func<TDbContext, Task<TResponse>> operation, bool autoCommit = true)
         where TResponse : Response, new()
     {
         // Begin transactions
@@ -34,7 +34,10 @@ public class QueryExecutor<TDbContext>(
         try
         {
             TResponse result = await operation(dbContext);
-            await transaction.CommitAsync();
+            
+            if(autoCommit)
+                await transaction.CommitAsync();
+            
             return result;
         }
         catch (Exception e)

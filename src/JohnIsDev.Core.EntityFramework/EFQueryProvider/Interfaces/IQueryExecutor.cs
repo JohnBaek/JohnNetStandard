@@ -11,13 +11,14 @@ namespace JohnIsDev.Core.EntityFramework.EFQueryProvider.Interfaces;
 public interface IQueryExecutor<TDbContext> where TDbContext : DbContext
 {
     /// <summary>
-    /// Executes a provided operation within a database transaction. If the operation fails, the transaction will be rolled back.
+    /// Executes an operation within a transactional scope and optionally commits the transaction automatically.
     /// </summary>
-    /// <typeparam name="TResponse">The type of the response that extends the <see cref="Response"/> class.</typeparam>
-    /// <param name="operation">The operation to execute within the transaction. This is a function that returns a task of type <typeparamref name="TResponse"/>.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the response of type <typeparamref name="TResponse"/>.</returns>
+    /// <typeparam name="TResponse">The type of the response expected from the operation.</typeparam>
+    /// <param name="operation">The function representing the operation to be executed within the transaction.</param>
+    /// <param name="autoCommit">Indicates whether the transaction should be automatically committed upon successful execution. Defaults to true.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains the response of type <typeparamref name="TResponse"/>.</returns>
     Task<TResponse> ExecuteWithTransactionAutoCommitAsync<TResponse>(
-        Func<TDbContext, Task<TResponse>> operation)
+        Func<TDbContext, Task<TResponse>> operation, bool autoCommit = true)
         where TResponse : Response, new();
 
 
