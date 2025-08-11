@@ -179,7 +179,7 @@ public class RabbitMqMessageBus : IMessageBus
             
             // Serialize message
             byte[] body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
-            _logger.LogInformation($"Publishing RPC to {exchangeName} with CorrelationId {correlationId}");
+            _logger.LogInformation($"Publishing RPC to exchangeName: {exchangeName} RoutingKey: {routingKey}  with CorrelationId: {correlationId}");
             
             // Request message publishes
             await channel.BasicPublishAsync(
