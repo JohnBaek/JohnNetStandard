@@ -297,7 +297,7 @@ public class RabbitMqMessageBus : IMessageBus
                 catch (Exception e)
                 {
                     _logger.LogError(e, $"Error processing RPC request with CorrelationId: {correlationId}");
-                    await channel.BasicNackAsync(eventArgs.DeliveryTag, false, true);
+                    await channel.BasicNackAsync(eventArgs.DeliveryTag, false, false);
                 }
             };
             
