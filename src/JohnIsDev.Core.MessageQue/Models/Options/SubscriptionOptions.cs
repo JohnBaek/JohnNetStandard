@@ -1,4 +1,4 @@
-namespace JohnIsDev.Core.MessageQue.Models;
+namespace JohnIsDev.Core.MessageQue.Models.Options;
 
 /// <summary>
 /// Represents configuration options for a message subscription.
