@@ -6,7 +6,7 @@
         <Version>9.0.11</Version>
         <Description>Core library for John </Description>
         <TargetFramework>net9.0</TargetFramework>
-        <LangVersion>14</LangVersion>
+        <LangVersion>13</LangVersion>
     </PropertyGroup>
     
     <ItemGroup>
