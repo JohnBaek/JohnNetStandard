@@ -54,6 +54,41 @@ public class QueryExecutor<TDbContext>(
     }
 
     /// <summary>
+    /// Executes the provided operation within a database transaction asynchronously. If no exceptions occur, automatically commits the transaction based on the specified auto-commit flag.
+    /// </summary>
+    /// <typeparam name="TResponse">The response type inheriting from <see cref="Response"/> that the operation will return.</typeparam>
+    /// <param name="operation">A function that performs the database operation. It accepts the database context and transaction as parameters and returns a task of type <typeparamref name="TResponse"/>.</param>
+    /// <param name="autoCommit">A boolean flag indicating whether the transaction should automatically commit upon successful execution. The default value is true.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains the response of type <typeparamref name="TResponse"/>.</returns>
+    public async Task<TResponse> ExecuteWithTransactionAutoCommitAsync<TResponse>(
+        Func<TDbContext, IDbContextTransaction, Task<TResponse>> operation, bool autoCommit = true)
+        where TResponse : Response, new()
+    {
+        // Begin transactions
+        await using IDbContextTransaction transaction = await dbContext.Database.BeginTransactionAsync();
+        try
+        {
+            TResponse result = await operation(dbContext, transaction);
+            
+            if(autoCommit)
+                await transaction.CommitAsync();
+            
+            return result;
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            logger.LogError(e, e.Message);
+            return new TResponse
+            {
+                Result = EnumResponseResult.Error,
+                Code = "TRANSACTION_ERROR",
+                Message = "Error has been occurred. while executing transaction."
+            };
+        }
+    }
+
+    /// <summary>
     /// Executes the specified query asynchronously and returns a paginated response containing the results.
     /// </summary>
     /// <param name="queryable">The queryable object representing the database query to execute.</param>

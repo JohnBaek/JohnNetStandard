@@ -8,43 +8,52 @@ namespace JohnIsDev.Core.Models.Responses;
 public class Response
 {
     /// <summary>
-    /// 기본 생성자 
+    /// Represents a generic response model intended to encapsulate the result of an operation,
+    /// containing properties for standardized error handling, messages, and any other associated information.
     /// </summary>
     public Response()
     {
     }
-    
+
     /// <summary>
-    /// 생성자
+    /// Represents a standardized response object that encapsulates the result of an operation,
+    /// providing detailed information such as response code, message, and result type.
     /// </summary>
-    /// <param name="code">응답 코드</param>
-    /// <param name="message">응답 메세지</param>
-    /// <param name="result">응답 결과</param>
-    public Response(EnumResponseResult result, string  code, string message )
+    public Response(EnumResponseResult result, string code, string message)
     {
         Code = code;
         Message = message;
         Result = result;
     }
-    
 
     /// <summary>
-    /// 응답 코드 
+    /// Encapsulates the outcome of an operation, detailing relevant information
+    /// such as error states, status messages, or associated data.
+    /// </summary>
+    public Response(EnumResponseResult result)
+    {
+        Code = "";
+        Message = "";
+        Result = result;
+    }
+
+    /// <summary>
+    /// 
     /// </summary>
     public string Code { get; set; } = "";
     
     /// <summary>
-    /// 응답 메세지 
+    /// 
     /// </summary>
     public string Message { get; set; } = "";
 
     /// <summary>
-    /// Authenticated?
+    /// Indicates whether the current response is associated with an authenticated user or process.
     /// </summary>
     public bool IsAuthenticated { get; set; } = false;
 
     /// <summary>
-    /// 응답 결과
+    /// Represents the result of an operation, indicating its state such as success, warning, or error.
     /// </summary>
     public EnumResponseResult Result { get; set; } = EnumResponseResult.Error;
 
@@ -62,4 +71,5 @@ public class Response
     /// Is Response Warning?
     /// </summary>
     public bool Warning => Result == EnumResponseResult.Warning;
+
 }

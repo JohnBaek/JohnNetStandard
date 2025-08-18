@@ -14,8 +14,9 @@ namespace JohnIsDev.Core.Models.Responses;
 public class ResponseData<T> : Response
 {
     /// <summary>
-    /// 기본 생성자 
+    /// Represents a data model encapsulating the response, derived from a generic type, with additional response properties.
     /// </summary>
+    /// <typeparam name="T">The type of the data object associated with the response.</typeparam>
     public ResponseData()
     {
     }
@@ -45,6 +46,18 @@ public class ResponseData<T> : Response
         Message = message;
         Data = data;
     }
+
+    /// <summary>
+    /// Represents a response model that includes the result status, code, message, and an optional data object of a specified type.
+    /// </summary>
+    /// <typeparam name="T">The type of the data object included in the response.</typeparam>
+    public ResponseData(EnumResponseResult result, T? data) : base(result)
+    {
+        Result = result;
+        Code = "";
+        Message = "";
+        Data = data;
+    }
     
     /// <summary>
     /// 생성자
@@ -57,6 +70,17 @@ public class ResponseData<T> : Response
         Result = result;
         Code = code;
         Message = message;
+    }
+
+    /// <summary>
+    /// Represents a data model encapsulating the response, derived from a generic type, with additional support for customization of result types, codes, messages, and optional associated data.
+    /// </summary>
+    /// <typeparam name="T">The type of the data object associated with the response.</typeparam>
+    public ResponseData(EnumResponseResult result) : base(result)
+    {
+        Result = result;
+        Code = "";
+        Message = "";
     }
 
 
