@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Bogus;
+using CommonModels;
 using FluentAssertions;
 using JohnIsDev.Core.EntityFramework.Implements;
 using JohnIsDev.Core.Models.Common.Enums;
