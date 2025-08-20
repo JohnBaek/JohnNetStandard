@@ -2,14 +2,14 @@ using System.Collections.Concurrent;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
-using JohnIsDev.Core.EntityFramework.EFQueryProvider.Interfaces;
+using JohnIsDev.Core.EntityFramework.Interfaces;
 using JohnIsDev.Core.Features.Extensions;
 using JohnIsDev.Core.Models.Common.Enums;
 using JohnIsDev.Core.Models.Common.Query;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace JohnIsDev.Core.EntityFramework.EFQueryProvider.Implements;
+namespace JohnIsDev.Core.EntityFramework.Implements;
 
 /// <summary>
 /// The QueryBuilder class provides functionality for dynamically building LINQ queries

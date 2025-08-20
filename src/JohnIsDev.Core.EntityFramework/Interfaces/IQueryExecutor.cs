@@ -3,7 +3,7 @@ using JohnIsDev.Core.Models.Responses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace JohnIsDev.Core.EntityFramework.EFQueryProvider.Interfaces;
+namespace JohnIsDev.Core.EntityFramework.Interfaces;
 
 /// <summary>
 /// Provides an interface to execute operations within a transactional context.

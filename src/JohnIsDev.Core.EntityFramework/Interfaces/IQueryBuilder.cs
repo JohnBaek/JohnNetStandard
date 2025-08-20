@@ -1,8 +1,7 @@
 using JohnIsDev.Core.Models.Common.Query;
-using JohnIsDev.Core.Models.Responses;
 using Microsoft.EntityFrameworkCore;
 
-namespace JohnIsDev.Core.EntityFramework.EFQueryProvider.Interfaces;
+namespace JohnIsDev.Core.EntityFramework.Interfaces;
 
 /// <summary>
 /// QueryBuilder 

@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Bogus;
 using FluentAssertions;
-using JohnIsDev.Core.EntityFramework.EFQueryProvider.Implements;
+using JohnIsDev.Core.EntityFramework.Implements;
 using JohnIsDev.Core.Models.Common.Enums;
 using JohnIsDev.Core.Models.Common.Query;
 using Microsoft.AspNetCore.Http.Extensions;

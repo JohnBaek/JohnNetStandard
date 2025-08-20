@@ -1,4 +1,4 @@
-using JohnIsDev.Core.EntityFramework.EFQueryProvider.Interfaces;
+using JohnIsDev.Core.EntityFramework.Interfaces;
 using JohnIsDev.Core.Extensions;
 using JohnIsDev.Core.Models.Common.Enums;
 using JohnIsDev.Core.Models.Common.Query;
@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
-namespace JohnIsDev.Core.EntityFramework.EFQueryProvider.Implements;
+namespace JohnIsDev.Core.EntityFramework.Implements;
 
 /// <summary>
 /// Provides an interface to execute operations within a transactional context.
