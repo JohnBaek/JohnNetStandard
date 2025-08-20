@@ -366,12 +366,13 @@ public IQueryable<T>? BuildQuery<T>(RequestQuery requestQuery, IQueryable<T> que
                 {
                     // Contains
                     case EnumQuerySearchType.Equals:
+                    case EnumQuerySearchType.NumericOrEnums:
                         Expression equalExpression = Expression.Equal(memberExpression, constant);
                         result = result == null
                             ? equalExpression
                             : Expression.Or(result, equalExpression);
                         break;
-                    
+         
                     // Like
                     case EnumQuerySearchType.Like:
                         MethodInfo? likeMethod = typeof(DbFunctionsExtensions).GetMethod("Like", [typeof(DbFunctions), typeof(string), typeof(string)
