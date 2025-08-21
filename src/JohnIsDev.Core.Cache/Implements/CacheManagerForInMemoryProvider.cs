@@ -1,13 +1,19 @@
 using System.Collections.Concurrent;
 using JohnIsDev.Core.Cache.Interfaces;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace JohnIsDev.Core.Cache.Implements;
 
 /// <summary>
 /// InMemory Cache Manager (Should replace integrated server)
 /// </summary>
-public class CacheManagerForInMemoryProvider(IMemoryCache memoryCache) : ICacheManager
+public class CacheManagerForInMemoryProvider(
+    ILogger<CacheManagerForInMemoryProvider> logger, 
+    IMemoryCache memoryCache ,
+    IOutputCacheStore cacheStore
+    ) : ICacheManager
 {
     /// <summary>
     /// a Locking
@@ -132,6 +138,23 @@ public class CacheManagerForInMemoryProvider(IMemoryCache memoryCache) : ICacheM
 
             return data;
         }
+    }
+
+    /// <summary>
+    /// Executes a specified callback function and evicts the associated cache entry.
+    /// </summary>
+    /// <param name="cacheKey">The key of the cache entry to be evicted.</param>
+    /// <param name="callback">A function to be executed which retrieves the data.</param>
+    /// <typeparam name="T">The type of data being retrieved.</typeparam>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the returned data of type T.</returns>
+    public async Task<T> ExecuteAndEvictCacheAsync<T>(string cacheKey, Func<Task<T>> callback)
+    {
+        // Operation Data 
+        var response = await callback();
+            
+        // Evict Cache
+        await cacheStore.EvictByTagAsync(cacheKey, CancellationToken.None);
+        return response;
     }
 }
 

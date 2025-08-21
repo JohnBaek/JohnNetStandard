@@ -1,5 +1,6 @@
 using System.Text.Json;
 using JohnIsDev.Core.Cache.Interfaces;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
@@ -10,7 +11,7 @@ namespace JohnIsDev.Core.Cache.Implements;
 /// <summary>
 /// A Redis Cache Memory Service Provider
 /// </summary>
-public class CacheManagerForRedisProvider(IDatabase redis, ILogger<CacheManagerForRedisProvider> logger) : ICacheManager
+public class CacheManagerForRedisProvider(ILogger<CacheManagerForRedisProvider> logger, IDatabase redis, IOutputCacheStore cacheStore) : ICacheManager
 {
     /// <summary>
     /// a Locking  
@@ -154,5 +155,22 @@ public class CacheManagerForRedisProvider(IDatabase redis, ILogger<CacheManagerF
         
             return data;
         }
+    }
+
+    /// <summary>
+    /// Executes a specified callback function and evicts the associated cache entry.
+    /// </summary>
+    /// <param name="cacheKey">The key of the cache entry to be evicted.</param>
+    /// <param name="callback">A function to be executed which retrieves the data.</param>
+    /// <typeparam name="T">The type of data being retrieved.</typeparam>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the returned data of type T.</returns>
+    public async Task<T> ExecuteAndEvictCacheAsync<T>(string cacheKey, Func<Task<T>> callback)
+    {
+        // Operation Data 
+        var response = await callback();
+            
+        // Evict Cache
+        await cacheStore.EvictByTagAsync(cacheKey, CancellationToken.None);
+        return response;
     }
 }
