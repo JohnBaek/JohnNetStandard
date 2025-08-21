@@ -65,13 +65,15 @@ public interface ICacheManager
         string cacheKey,
         TimeSpan cacheDuration,
         Func<Task<List<T>>> callback);
-
+    
     /// <summary>
-    /// Executes the provided asynchronous operation and evicts the cached data associated with the specified key.
+    /// GetOrSetCache Async
     /// </summary>
-    /// <param name="cacheKey">The key of the cache entry to be evicted.</param>
-    /// <param name="callback">The asynchronous operation to execute.</param>
-    /// <typeparam name="T">The type of the data to be returned.</typeparam>
-    /// <returns>The result of the asynchronous operation of type T.</returns>
-    Task<T> ExecuteAndEvictCacheAsync<T>(string cacheKey, Func<Task<T>> callback);
+    /// <param name="cacheKey"></param>
+    /// <param name="cacheDuration"></param>
+    /// <param name="callback"></param>
+    public Task<T> GetOrSetCacheWithAsync<T>(
+        string cacheKey,
+        TimeSpan cacheDuration,
+        Func<Task<T>> callback);
 }

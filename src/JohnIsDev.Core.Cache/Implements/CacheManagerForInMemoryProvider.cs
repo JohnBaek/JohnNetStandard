@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using JohnIsDev.Core.Cache.Interfaces;
-using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
@@ -11,8 +10,7 @@ namespace JohnIsDev.Core.Cache.Implements;
 /// </summary>
 public class CacheManagerForInMemoryProvider(
     ILogger<CacheManagerForInMemoryProvider> logger, 
-    IMemoryCache memoryCache ,
-    IOutputCacheStore cacheStore
+    IMemoryCache memoryCache 
     ) : ICacheManager
 {
     /// <summary>
@@ -112,9 +110,21 @@ public class CacheManagerForInMemoryProvider(
     /// <param name="cacheDuration"></param>
     /// <param name="callback"></param>
     public async Task<List<T>> GetOrSetCacheAsync<T>(string cacheKey, TimeSpan cacheDuration, Func<Task<List<T>>> callback)
+        => await GetOrSetCacheWithAsync(cacheKey, cacheDuration, callback);
+
+    /// <summary>
+    /// Retrieves a cached item by its key. If the item is not in the cache, it executes the provided callback to load the data,
+    /// adds the data to the cache for a specified duration, and then returns the data.
+    /// </summary>
+    /// <param name="cacheKey">The unique key used for identifying the cached item.</param>
+    /// <param name="cacheDuration">The time duration for which the item will be stored in the cache.</param>
+    /// <param name="callback">The asynchronous function to execute if the item does not exist in the cache.</param>
+    /// <typeparam name="T">The type of the cached item.</typeparam>
+    /// <returns>The cached item, either retrieved from the cache or obtained by executing the callback.</returns>
+    public async Task<T> GetOrSetCacheWithAsync<T>(string cacheKey, TimeSpan cacheDuration, Func<Task<T>> callback)
     {
         // Get a data from Cache
-        var cachedData = Get<List<T>>(cacheKey);
+        var cachedData = Get<T>(cacheKey);
         if (cachedData != null)
         {
             return cachedData;
@@ -124,7 +134,7 @@ public class CacheManagerForInMemoryProvider(
         using (await _asyncLock.LockAsync(cacheKey))
         {
             // 이중 확인 잠금 패턴 (Double-Check Locking)
-            cachedData = Get<List<T>>(cacheKey);
+            cachedData = Get<T>(cacheKey);
             if (cachedData != null)
             {
                 return cachedData;
@@ -138,23 +148,6 @@ public class CacheManagerForInMemoryProvider(
 
             return data;
         }
-    }
-
-    /// <summary>
-    /// Executes a specified callback function and evicts the associated cache entry.
-    /// </summary>
-    /// <param name="cacheKey">The key of the cache entry to be evicted.</param>
-    /// <param name="callback">A function to be executed which retrieves the data.</param>
-    /// <typeparam name="T">The type of data being retrieved.</typeparam>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the returned data of type T.</returns>
-    public async Task<T> ExecuteAndEvictCacheAsync<T>(string cacheKey, Func<Task<T>> callback)
-    {
-        // Operation Data 
-        var response = await callback();
-            
-        // Evict Cache
-        await cacheStore.EvictByTagAsync(cacheKey, CancellationToken.None);
-        return response;
     }
 }
 

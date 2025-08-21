@@ -11,7 +11,7 @@ namespace JohnIsDev.Core.Cache.Implements;
 /// <summary>
 /// A Redis Cache Memory Service Provider
 /// </summary>
-public class CacheManagerForRedisProvider(ILogger<CacheManagerForRedisProvider> logger, IDatabase redis, IOutputCacheStore cacheStore) : ICacheManager
+public class CacheManagerForRedisProvider(ILogger<CacheManagerForRedisProvider> logger, IDatabase redis) : ICacheManager
 {
     /// <summary>
     /// a Locking  
@@ -157,20 +157,8 @@ public class CacheManagerForRedisProvider(ILogger<CacheManagerForRedisProvider> 
         }
     }
 
-    /// <summary>
-    /// Executes a specified callback function and evicts the associated cache entry.
-    /// </summary>
-    /// <param name="cacheKey">The key of the cache entry to be evicted.</param>
-    /// <param name="callback">A function to be executed which retrieves the data.</param>
-    /// <typeparam name="T">The type of data being retrieved.</typeparam>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the returned data of type T.</returns>
-    public async Task<T> ExecuteAndEvictCacheAsync<T>(string cacheKey, Func<Task<T>> callback)
+    public Task<T> GetOrSetCacheWithAsync<T>(string cacheKey, TimeSpan cacheDuration, Func<Task<T>> callback)
     {
-        // Operation Data 
-        var response = await callback();
-            
-        // Evict Cache
-        await cacheStore.EvictByTagAsync(cacheKey, CancellationToken.None);
-        return response;
+        throw new NotImplementedException();
     }
 }
