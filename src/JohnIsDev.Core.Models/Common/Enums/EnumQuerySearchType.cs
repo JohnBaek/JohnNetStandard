@@ -9,6 +9,11 @@ public enum EnumQuerySearchType
     /// Contains Search
     /// </summary>
     Equals ,
+    
+    /// <summary>
+    /// Boolean Search
+    /// </summary>
+    Boolean ,
      
     /// <summary>
     /// 스트링 Like 검색

@@ -55,13 +55,20 @@ public class QueryBuilder<TDbContext>(
     /// <param name="queryable">The IQueryable instance to apply the query conditions to.</param>
     /// <returns>An IQueryable of type T with the applied query conditions, or null if an error occurs.</returns>
     // JohnIsDev.Core.EntityFramework.EFQueryProvider.Implements.QueryBuilder
-public IQueryable<T>? BuildQuery<T>(RequestQuery requestQuery, IQueryable<T> queryable) where T : class
+    public IQueryable<T>? BuildQuery<T>(RequestQuery requestQuery, IQueryable<T> queryable) where T : class
 {
     try
     {
-        List<Expression<Func<T, bool>>> whereConditions = CreateSearchConditions<T>(requestQuery);
-        if (whereConditions.Count > 0)
-            queryable = whereConditions.Aggregate(queryable, (current, condition) => current.Where(condition));
+        // List<Expression<Func<T, bool>>> whereConditions = CreateSearchConditions<T>(requestQuery);
+        // if (whereConditions.Count > 0)
+        //     queryable = whereConditions.Aggregate(queryable, (current, condition) => current.Where(condition));
+
+        Expression<Func<T, bool>>? whereCondition = CreateSearchConditions<T>(requestQuery);
+        if (whereCondition != null)
+        {
+            queryable = queryable.Where(whereCondition);
+        }
+        
         
         IEnumerable<QuerySortOrder> sortOrders = ConvertToQuerySortList(requestQuery);
         bool isFirstSort = true;
@@ -191,57 +198,146 @@ public IQueryable<T>? BuildQuery<T>(RequestQuery requestQuery, IQueryable<T> que
     //         return new ResponseList<TConvert>(EnumResponseResult.Error, "COMMON_DATABASE_ERROR","", []);
     //     }
     // }
+    
+    /// <summary>
+    /// An ExpressionVisitor to replace a parameter in an expression with another one.
+    /// This is crucial for combining two lambda expressions that were created with different parameter instances.
+    /// </summary>
+    private class ParameterReplacer : ExpressionVisitor
+    {
+        private readonly ParameterExpression _parameter;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParameterReplacer"/> class.
+        /// </summary>
+        /// <param name="parameter">The parameter to replace with.</param>
+        internal ParameterReplacer(ParameterExpression parameter)
+        {
+            _parameter = parameter;
+        }
+
+        /// <summary>
+        /// Visits the <see cref="ParameterExpression"/>.
+        /// </summary>
+        /// <param name="node">The expression to visit.</param>
+        /// <returns>The modified expression, if it or any subexpression was modified; otherwise, returns the original expression.</returns>
+        protected override Expression VisitParameter(ParameterExpression node)
+        {
+            // Replace every parameter found with the one we passed in.
+            return base.VisitParameter(_parameter);
+        }
+    }
+    
+    /// <summary>
+    /// Create a where statement by meta-information
+    /// </summary>
+    private Expression<Func<T, bool>>? CreateSearchConditions<T>(RequestQuery requestQuery)
+    {
+        try
+        {
+            ParameterExpression parameterExpression = Expression.Parameter(typeof(T), "x");
+            Expression? combinedExpression = null;
+            IEnumerable<QuerySearch> convertedQuerySearches = ConvertToQuerySearchListInternal(requestQuery);
+        
+            foreach (QuerySearch querySearch in convertedQuerySearches)
+            {
+                RequestQuerySearchMeta? meta = requestQuery.SearchMetas
+                    .Find(i => i.Field.Equals(querySearch.Field, StringComparison.CurrentCultureIgnoreCase));
+
+                if (meta == null)
+                    continue;
+                
+                var tempParameter = Expression.Parameter(typeof(T), "p");
+                var memberExpression = Expression.Property(tempParameter, meta.Field);
+            
+                // MemberExpression memberExpression = Expression.Property(parameterExpression, meta.Field);
+                List<string> searchKeywords = querySearch.Keyword?.Split(';').ToList() ?? [];
+            
+                Expression? singleCondition = CreateConditionExpression(meta, querySearch, memberExpression, searchKeywords);
+
+                if (singleCondition == null)
+                    continue;
+                
+                
+                if (combinedExpression == null)
+                {
+                    combinedExpression = new ParameterReplacer(parameterExpression).Visit(singleCondition);
+                }
+                else
+                {
+                    var rewrittenCondition = new ParameterReplacer(parameterExpression).Visit(singleCondition);
+                    combinedExpression = Expression.AndAlso(combinedExpression, rewrittenCondition);
+                }
+                
+                //
+                // combinedExpression = combinedExpression == null
+                //     ? singleCondition
+                //     : Expression.AndAlso(combinedExpression, singleCondition);
+            }
+
+            return combinedExpression != null
+                ? Expression.Lambda<Func<T, bool>>(combinedExpression, parameterExpression)
+                : null;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return null;
+        }
+    }
+
+    
 
     /// <summary>
     /// Create a where statement by meta-information
     /// </summary>
     /// <param name="requestQuery"></param>
-    private List<Expression<Func<T, bool>>> CreateSearchConditions<T>(RequestQuery requestQuery)
-    {
-        List<Expression<Func<T, bool>>> conditions = [];
-        try
-        {
-            // Convert Client request 
-            IEnumerable<QuerySearch> convertedQuerySearches = ConvertToQuerySearchListInternal(requestQuery);
-            
-            // Process all
-            foreach (QuerySearch querySearch in convertedQuerySearches)
-            {
-                // Find Target Meta 
-                RequestQuerySearchMeta? meta = requestQuery.SearchMetas
-                    .Find(i => 
-                        i.Field.Equals(querySearch.Field, StringComparison.CurrentCultureIgnoreCase));
-
-                // Does not have a meta 
-                if(meta == null)
-                    continue;
-                
-                // Alias
-                ParameterExpression parameterExpression = Expression.Parameter(typeof(T), "x");
-                
-                // MemberExpression
-                MemberExpression memberExpression = Expression.Property(parameterExpression, meta.Field);
-                
-                // To Create a Keyword list by split ; 
-                List<string> searchKeywords = querySearch.Keyword?.Split(';').ToList() ?? [];
-                
-                // Process By Meta types
-                Expression? conditionExpression = CreateConditionExpression(meta: meta , query: querySearch , memberExpression: memberExpression ,keywords: searchKeywords);
-                
-                // If it cannot make
-                if(conditionExpression == null)
-                    continue;
-                
-                // Add Conditions
-                conditions.Add(Expression.Lambda<Func<T, bool>>(conditionExpression, parameterExpression));
-            }
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e, e.Message);
-        }
-        return conditions;
-    }
+    // private List<Expression<Func<T, bool>>> CreateSearchConditions<T>(RequestQuery requestQuery)
+    // {
+    //     List<Expression<Func<T, bool>>> conditions = [];
+    //     try
+    //     {
+    //         // Convert Client request 
+    //         IEnumerable<QuerySearch> convertedQuerySearches = ConvertToQuerySearchListInternal(requestQuery);
+    //         
+    //         // Process all
+    //         foreach (QuerySearch querySearch in convertedQuerySearches)
+    //         {
+    //             // Find Target Meta 
+    //             RequestQuerySearchMeta? meta = requestQuery.SearchMetas
+    //                 .Find(i => 
+    //                     i.Field.Equals(querySearch.Field, StringComparison.CurrentCultureIgnoreCase));
+    //
+    //             // Does not have a meta 
+    //             if(meta == null)
+    //                 continue;
+    //             
+    //             // Alias
+    //             ParameterExpression parameterExpression = Expression.Parameter(typeof(T), "x");
+    //             
+    //             // MemberExpression
+    //             MemberExpression memberExpression = Expression.Property(parameterExpression, meta.Field);
+    //             
+    //             // To Create a Keyword list by split ; 
+    //             List<string> searchKeywords = querySearch.Keyword?.Split(';').ToList() ?? [];
+    //             
+    //             // Process By Meta types
+    //             Expression? conditionExpression = CreateConditionExpression(meta: meta , query: querySearch , memberExpression: memberExpression ,keywords: searchKeywords);
+    //             
+    //             // If it cannot make
+    //             if(conditionExpression == null)
+    //                 continue;
+    //             
+    //             // Add Conditions
+    //             conditions.Add(Expression.Lambda<Func<T, bool>>(conditionExpression, parameterExpression));
+    //         }
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         logger.LogError(e, e.Message);
+    //     }
+    //     return conditions;
+    // }
     
     /// <summary>
     /// ConvertToQuerySearchList
@@ -372,7 +468,32 @@ public IQueryable<T>? BuildQuery<T>(RequestQuery requestQuery, IQueryable<T> que
                             ? equalExpression
                             : Expression.Or(result, equalExpression);
                         break;
-         
+                    
+                    case EnumQuerySearchType.Boolean:
+                        if (keywords == null || !keywords.Any())
+                            continue;
+
+                        bool boolValue;
+                        if (keyword == "true" || keyword == "0")
+                        {
+                            boolValue = true;
+                        }
+                        else if (keyword == "false" || keyword == "1")
+                        {
+                            boolValue = false;
+                        }
+                        else
+                        {
+                            continue; 
+                        }
+
+                        constant = Expression.Constant(boolValue, memberExpression.Type);
+                        equalExpression = Expression.Equal(memberExpression, constant);
+                        result = result == null
+                            ? equalExpression
+                            : Expression.OrElse(result, equalExpression);
+                        break;
+                    
                     // Like
                     case EnumQuerySearchType.Like:
                         MethodInfo? likeMethod = typeof(DbFunctionsExtensions).GetMethod("Like", [typeof(DbFunctions), typeof(string), typeof(string)
