@@ -448,7 +448,16 @@ public class QueryBuilder<TDbContext>(
         try
         {
             // Check has cache before Create an expression
-            string cacheKey = $"{meta.Field}_{meta.SearchType}_{string.Join(",", keywords)}";
+            string cacheKey = "";
+            if (meta.SearchType == EnumQuerySearchType.RangeDate)
+            {
+                cacheKey = $"{meta.Field}_{meta.SearchType}_{query.StartDate:yyyy-MM-dd}_{query.EndDate:yyyy-MM-dd} ";
+            }
+            else
+            {
+                cacheKey = $"{meta.Field}_{meta.SearchType}_{string.Join(",", keywords)}";
+            }
+            
             if(ExpressionCache.TryGetValue(cacheKey, out Expression? expression))
                 return expression;
             
@@ -513,8 +522,8 @@ public class QueryBuilder<TDbContext>(
                     // Range Date
                     case EnumQuerySearchType.RangeDate:
                         // Ensure StartDate and EndDate are DateTime
-                        DateTime startDateValue = DateTime.Parse(query.StartDate.ToString("yyyy-MM-dd"));
-                        DateTime endDateValue = DateTime.Parse(query.EndDate.ToString("yyyy-MM-dd")).AddDays(1);
+                        DateTime startDateValue = DateTime.Parse(query.StartDate.ToString("yyyy-MM-dd 00:00:00"));
+                        DateTime endDateValue = DateTime.Parse(query.EndDate.ToString("yyyy-MM-dd 00:00:00"));
 
                         // Convert memberExpression to DateTime
                         var convertedMember = Expression.Convert(memberExpression, typeof(DateTime));
