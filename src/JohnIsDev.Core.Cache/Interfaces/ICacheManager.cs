@@ -76,4 +76,16 @@ public interface ICacheManager
         string cacheKey,
         TimeSpan cacheDuration,
         Func<Task<T>> callback);
+    
+    
+    /// <summary>
+    /// GetOrSetCache Async
+    /// </summary>
+    /// <param name="cacheKey"></param>
+    /// <param name="cacheDuration"></param>
+    /// <param name="callback"></param>
+    public T GetOrSetCacheWith<T>(
+        string cacheKey,
+        TimeSpan cacheDuration,
+        Func<T> callback);
 }

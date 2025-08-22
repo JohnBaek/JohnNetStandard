@@ -161,4 +161,9 @@ public class CacheManagerForRedisProvider(ILogger<CacheManagerForRedisProvider> 
     {
         throw new NotImplementedException();
     }
+
+    public T GetOrSetCacheWith<T>(string cacheKey, TimeSpan cacheDuration, Func<T> callback)
+    {
+        throw new NotImplementedException();
+    }
 }

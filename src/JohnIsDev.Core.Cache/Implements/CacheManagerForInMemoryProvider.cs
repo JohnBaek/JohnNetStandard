@@ -149,6 +149,37 @@ public class CacheManagerForInMemoryProvider(
             return data;
         }
     }
+
+    /// <summary>
+    /// Retrieves the cached data associated with the given cache key or sets it using the specified callback if not present.
+    /// </summary>
+    /// <param name="cacheKey">The key associated with the cache entry.</param>
+    /// <param name="cacheDuration">The duration for which the data should be cached.</param>
+    /// <param name="callback">The function to execute to generate the data if it is not already cached.</param>
+    /// <typeparam name="T">The type of the cached data.</typeparam>
+    /// <returns>The cached data of type T.</returns>
+    public T GetOrSetCacheWith<T>(string cacheKey, TimeSpan cacheDuration, Func<T> callback)
+    {
+        // Get a data from Cache
+        var cachedData = Get<T>(cacheKey);
+        if (cachedData != null)
+        {
+            return cachedData;
+        }
+
+        if (cachedData != null)
+        {
+            return cachedData;
+        }
+
+        // 데이터 로드
+        var data = callback();
+
+        // 데이터 캐시 설정 (빈 리스트도 캐시)
+        Set(cacheKey, data, cacheDuration);
+
+        return data;
+    }
 }
 
 /// <summary>
