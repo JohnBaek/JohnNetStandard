@@ -14,6 +14,12 @@ namespace JohnIsDev.Core.Features.Utils;
 public class FileUtils(ILogger<FileUtils> logger)
 {
     /// <summary>
+    /// Array of size suffixes used to represent data sizes in human-readable formats.
+    /// Ranges from "bytes" to "YB" (yottabytes).
+    /// </summary>
+    private static readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+    
+    /// <summary>
     /// Known Magic numbers for files
     /// </summary>
     private static readonly Dictionary<string, List<byte[]>> KnownSignatures = new()
@@ -149,4 +155,31 @@ public class FileUtils(ILogger<FileUtils> logger)
 
     private static bool HasUtf16Bom(byte[] bytes) =>
         bytes.Length >= 2 && ((bytes[0] == 0xFF && bytes[1] == 0xFE) || (bytes[0] == 0xFE && bytes[1] == 0xFF));
+
+    /// <summary>
+    /// Converts a file size in bytes to a human-readable string representation using the appropriate size suffix (e.g., KB, MB, GB).
+    /// </summary>
+    /// <param name="value">The file size in bytes to convert.</param>
+    /// <param name="decimalPlaces">The number of decimal places to include in the output. Defaults to 1.</param>
+    /// <returns>A human-readable string representation of the file size with the appropriate size suffix.</returns>
+    public static string ToReadableSize(long value, int decimalPlaces = 1)
+    {
+        if (value < 0)
+        {
+            return "-" + ToReadableSize(-value, decimalPlaces); }
+        if (value == 0) { return string.Format("{0:n" + decimalPlaces + "} bytes", 0); }
+
+        int mag = (int)Math.Log(value, 1024);
+
+        decimal adjustedSize = (decimal)value / (1L << (mag * 10));
+
+        if (Math.Round(adjustedSize, decimalPlaces) >= 1000)
+        {
+            mag += 1;
+            adjustedSize /= 1024;
+        }
+
+        return string.Format("{0:n" + decimalPlaces + "} {1}", adjustedSize, SizeSuffixes[mag]);
+    }
+    
 }
