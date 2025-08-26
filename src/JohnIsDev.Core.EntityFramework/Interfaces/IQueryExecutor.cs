@@ -70,4 +70,17 @@ public interface IQueryExecutor<TDbContext> where TDbContext : DbContext
         IQueryable<TQueryable> queryable, RequestQuery requestQuery)
         where TConvert : class
         where TQueryable : class;
+
+    /// <summary>
+    /// Maps a queryable source to a list of a different type and converts the result into a ResponseList.
+    /// </summary>
+    /// <typeparam name="TQueryable">The type of the elements in the queryable source.</typeparam>
+    /// <typeparam name="TConvert">The type of the elements after mapping.</typeparam>
+    /// <param name="queryable">The queryable source to be mapped and converted.</param>
+    /// <param name="requestQuery">The request query containing pagination and filtering parameters.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains a <see cref="ResponseList{TConvert}"/> with the converted items.</returns>
+    Task<ResponseList<TConvert>> ToResponseListAutoMappingAsync<TQueryable, TConvert>(
+        IQueryable<TQueryable> queryable)
+        where TConvert : class
+        where TQueryable : class;
 }

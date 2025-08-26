@@ -200,4 +200,16 @@ public class QueryExecutor<TDbContext>(
             return new ResponseList<TConvert>(EnumResponseResult.Error, "COMMON_DATABASE_ERROR","", []);
         }
     }
+
+    /// <summary>
+    /// Converts the given queryable collection into a response list with automatic mapping, using a new default request query.
+    /// </summary>
+    /// <typeparam name="TQueryable">The type of the elements in the input queryable collection.</typeparam>
+    /// <typeparam name="TConvert">The type of the elements in the converted response list.</typeparam>
+    /// <param name="queryable">The queryable collection to be converted into a response list.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="ResponseList{TConvert}"/> with the converted elements.</returns>
+    public async Task<ResponseList<TConvert>>
+        ToResponseListAutoMappingAsync<TQueryable, TConvert>(IQueryable<TQueryable> queryable)
+        where TQueryable : class where TConvert : class
+        => await ToResponseListAutoMappingAsync<TQueryable, TConvert>(queryable, new RequestQuery(skip: 0, pageCount: int.MaxValue));
 }
