@@ -1,10 +1,7 @@
 using System.Text.Json;
 using JohnIsDev.Core.Cache.Interfaces;
-using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
-
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
 
 namespace JohnIsDev.Core.Cache.Implements;
 
