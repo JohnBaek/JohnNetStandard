@@ -16,6 +16,12 @@ public class CustomValidationFilter : IActionFilter
     /// <param name="context"></param>
     public void OnActionExecuting(ActionExecutingContext context)
     {
+        // Twilio 웹훅은 모델 검증 건너뛰기
+        if (IsTwilioWebhook(context))
+        {
+            return;
+        }
+        
         if (!context.ModelState.IsValid)
         {
             string? errorMessage = context.ModelState
@@ -47,6 +53,15 @@ public class CustomValidationFilter : IActionFilter
         }
     }
 
+    private bool IsTwilioWebhook(ActionExecutingContext context)
+    {
+        var path = context.HttpContext.Request.Path.Value;
+        var controllerName = context.RouteData.Values["controller"]?.ToString();
+        
+        return (path != null && path.StartsWith("api/v1/authentication/twilio", StringComparison.OrdinalIgnoreCase)) ||
+               (controllerName?.Equals("Twilio", StringComparison.OrdinalIgnoreCase) == true);
+    }
+    
     public void OnActionExecuted(ActionExecutedContext context)
     {
     }
