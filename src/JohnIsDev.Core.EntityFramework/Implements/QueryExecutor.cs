@@ -54,6 +54,28 @@ public class QueryExecutor<TDbContext>(
     }
 
     /// <summary>
+    /// Executes the provided database operation within a transaction asynchronously. Automatically commits the transaction if no exceptions occur and autoCommit is set to true.
+    /// </summary>
+    /// <param name="operation">A function representing the database operation to execute. The function takes the database context of type <typeparamref name="TDbContext"/> and returns a task.</param>
+    /// <param name="autoCommit">A boolean flag indicating whether the transaction should commit automatically. The default value is true.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public async Task ExecuteWithTransactionAutoCommitAsync(Func<TDbContext, Task> operation, bool autoCommit = true)
+    {
+        // Begin transactions
+        await using IDbContextTransaction transaction = await dbContext.Database.BeginTransactionAsync();
+        try
+        {
+            if(autoCommit)
+                await transaction.CommitAsync();
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            logger.LogError(e, e.Message);
+        }
+    }
+
+    /// <summary>
     /// Executes the provided operation within a database transaction asynchronously. If no exceptions occur, automatically commits the transaction based on the specified auto-commit flag.
     /// </summary>
     /// <typeparam name="TResponse">The response type inheriting from <see cref="Response"/> that the operation will return.</typeparam>

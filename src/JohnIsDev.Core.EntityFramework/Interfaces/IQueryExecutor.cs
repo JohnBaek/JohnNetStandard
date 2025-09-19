@@ -23,6 +23,17 @@ public interface IQueryExecutor<TDbContext> where TDbContext : DbContext
         Func<TDbContext, Task<TResponse>> operation, bool autoCommit = true)
         where TResponse : Response, new();
 
+
+    /// <summary>
+    /// Executes an operation within a transactional scope and optionally commits the transaction automatically.
+    /// </summary>
+    /// <param name="operation">The function representing the operation to be executed within the transaction.</param>
+    /// <param name="autoCommit">Indicates whether the transaction should be automatically committed upon successful execution. Defaults to true.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task ExecuteWithTransactionAutoCommitAsync(
+        Func<TDbContext, Task> operation, bool autoCommit = true);
+
+
     /// <summary>
     /// Executes an operation within a transactional scope and optionally commits the transaction automatically,
     /// allowing access to the database context and transaction object.
