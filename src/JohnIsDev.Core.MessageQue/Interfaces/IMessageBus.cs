@@ -1,6 +1,3 @@
-using JohnIsDev.Core.MessageQue.Models;
-using RabbitMQ.Client;
-
 namespace JohnIsDev.Core.MessageQue.Interfaces;
 
 /// <summary>

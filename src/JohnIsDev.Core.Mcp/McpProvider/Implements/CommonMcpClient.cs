@@ -1,7 +1,6 @@
 using JohnIsDev.Core.Mcp.McpProvider.Interfaces;
 using JohnIsDev.Core.Mcp.Models.Requests;
 using JohnIsDev.Core.Mcp.Models.Responses;
-using JohnIsDev.Core.Models.Common.Enums;
 using JohnIsDev.Core.Models.Responses;
 using Microsoft.Extensions.Logging;
 

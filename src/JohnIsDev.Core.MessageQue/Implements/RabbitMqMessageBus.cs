@@ -1,11 +1,6 @@
 using System.Text;
-using System.Text.Json.Serialization;
-using JohnIsDev.Core.Extensions;
 using JohnIsDev.Core.MessageQue.Interfaces;
-using JohnIsDev.Core.MessageQue.Models;
 using JohnIsDev.Core.MessageQue.Models.Configs;
-using JohnIsDev.Core.Models.Common.Enums;
-using JohnIsDev.Core.Models.Responses;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
