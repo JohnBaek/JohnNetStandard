@@ -115,6 +115,26 @@ public static class StringExtensions
             return false;
         }
     }
+
+    /// <summary>
+    /// Removes any non-alphabetic characters from the input string, retaining only letters and Korean characters.
+    /// </summary>
+    /// <param name="input">The input string to normalize.</param>
+    /// <returns>The normalized string containing only alphabetic and Korean characters, or an empty string if an error occurs.</returns>
+    public static string NormalizeText(this string input)
+    {
+        string pattern = "[^a-zA-Z가-힣]";
+        try
+        {
+            return Regex.Replace(input, pattern, "");
+        }
+        catch (Exception e)
+        {
+            return "";
+        }
+    }
+    
+    
     
     /// <summary>
     /// Validate Phone Number
