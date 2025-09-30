@@ -123,7 +123,7 @@ public static class StringExtensions
     /// <returns>The normalized string containing only alphabetic and Korean characters, or an empty string if an error occurs.</returns>
     public static string NormalizeText(this string input)
     {
-        string pattern = "[^a-zA-Z가-힣]";
+        string pattern = "[^a-zA-Z가-힣0-9]";
         try
         {
             return Regex.Replace(input, pattern, "").ToUpper();
