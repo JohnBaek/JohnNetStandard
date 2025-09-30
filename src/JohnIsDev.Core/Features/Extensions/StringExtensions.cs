@@ -126,7 +126,7 @@ public static class StringExtensions
         string pattern = "[^a-zA-Z가-힣]";
         try
         {
-            return Regex.Replace(input, pattern, "");
+            return Regex.Replace(input, pattern, "").ToUpper();
         }
         catch (Exception e)
         {
