@@ -1,7 +1,6 @@
 using JohnIsDev.Core.MessageQue.Implements;
 using JohnIsDev.Core.MessageQue.Interfaces;
 using JohnIsDev.Core.MessageQue.Models.Configs;
-using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
@@ -49,44 +48,6 @@ public static class ServiceCollectionExtensions
         });
         
         services.AddSingleton<IMessageBus, RabbitMqMessageBus>();
-        return services;
-    }
-
-    /// <summary>
-    /// Adds RabbitMQ and MassTransit configuration and services to the service collection.
-    /// </summary>
-    /// <param name="services">The service collection to which RabbitMQ and MassTransit services will be added.</param>
-    /// <param name="configuration">The configuration object containing RabbitMQ settings.</param>
-    /// <param name="registerConsumers">An action to register consumers in the MassTransit configuration.</param>
-    /// <param name="configureEndpointsAction">An action to configure endpoints for the RabbitMQ bus factory.</param>
-    /// <returns>The updated service collection.</returns>
-    public static IServiceCollection AddRabbitMqMassTransit(this IServiceCollection services,
-        IConfiguration configuration,
-        Action<IBusRegistrationConfigurator> registerConsumers,
-        Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator> configureEndpointsAction
-        )
-    {
-        services.AddMassTransit(massTransit =>
-        {
-            registerConsumers.Invoke(massTransit);
-            
-            IConfiguration config = configuration.GetSection("MessageQue:RabbitMQ");
-            string hostName = config["HostName"] ?? "localhost";
-            ushort port = ushort.Parse(config["Port"] ?? "5672");
-            string userName = config["UserName"] ?? "guest";
-            string password = config["Password"] ?? "guest";
-            
-            massTransit.UsingRabbitMq((context, cfg) =>
-            {
-                cfg.Host(hostName, port, "/", hostConfigure =>
-                {
-                    hostConfigure.Username(username: userName);
-                    hostConfigure.Password(password: password);
-                });
-                
-                configureEndpointsAction.Invoke(context, cfg);
-            });
-        });
         return services;
     }
 }
