@@ -6,7 +6,7 @@ using OpenAI.Chat;
 namespace JohnIsDev.Core.LLM.Implements;
 
 /// <summary>
-/// Represents a client implementation for interacting with the ChatGPT language model.
+/// Represents a client implementation for interacting with the ChatGpt language model.
 /// </summary>
 public class ChatGptClient : IChatClient
 {
@@ -21,7 +21,7 @@ public class ChatGptClient : IChatClient
     private readonly string _apiKey;
 
     /// <summary>
-    /// Represents the identifier of the model used for the ChatGPT client operations.
+    /// Represents the identifier of the model used for the ChatGpt client operations.
     /// </summary>
     private readonly string _model;
 
@@ -31,7 +31,7 @@ public class ChatGptClient : IChatClient
     private readonly IConfiguration _configuration;
 
     /// <summary>
-    /// Represents the internal chat client instance used for communicating with the OpenAI ChatGPT service.
+    /// Represents the internal chat client instance used for communicating with the OpenAI ChatGpt service.
     /// </summary>
     private readonly ChatClient _client;
 
@@ -57,15 +57,15 @@ public class ChatGptClient : IChatClient
     }
 
     /// <summary>
-    /// Sends a question to the ChatGPT client and retrieves a response asynchronously.
+    /// Sends a question to the ChatGpt client and retrieves a response asynchronously.
     /// </summary>
-    /// <param name="question">The question to be sent to the ChatGPT client.</param>
-    /// <returns>A task representing the asynchronous operation. The task result contains the response from the ChatGPT client, or an empty string if an error occurs or no response is received.</returns>
+    /// <param name="question">The question to be sent to the ChatGpt client.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains the response from the ChatGpt client, or an empty string if an error occurs or no response is received.</returns>
     public async Task<string> AskAsync(string question)
     {
         try
         {
-            // Send question to ChatGPT
+            // Send question to ChatGpt
             ChatCompletion completion = await _client.CompleteChatAsync(question);
             if(completion == null || completion.Content.Count == 0)
                 return "";

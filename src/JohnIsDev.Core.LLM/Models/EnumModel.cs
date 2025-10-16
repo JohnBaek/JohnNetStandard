@@ -6,12 +6,12 @@ namespace JohnIsDev.Core.LLM.Models;
 public enum EnumModel
 {
     /// <summary>
-    /// Represents the ChatGPT model type within the LLM core functionality.
+    /// Represents the ChatGpt model type within the LLM core functionality.
     /// </summary>
-    ChatGPT,
+    ChatGpt,
 
     /// <summary>
-    /// Represents the Gemini model type used within the LLM core functionality.
+    /// Represents the Geminie model type used within the LLM core functionality.
     /// </summary>
-    Gemini
+    Geminie
 }
