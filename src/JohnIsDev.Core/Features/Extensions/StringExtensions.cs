@@ -55,6 +55,8 @@ public static class StringExtensions
         return !string.IsNullOrWhiteSpace(input);
     }
 
+
+
     /// <summary>
     /// String to Int
     /// </summary>
@@ -117,10 +119,10 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Removes any non-alphabetic characters from the input string, retaining only letters and Korean characters.
+    /// Normalizes a given string by removing all non-alphanumeric characters and converting it to uppercase.
     /// </summary>
-    /// <param name="input">The input string to normalize.</param>
-    /// <returns>The normalized string containing only alphabetic and Korean characters, or an empty string if an error occurs.</returns>
+    /// <param name="input">The input string to be normalized.</param>
+    /// <returns>A normalized string containing only alphanumeric characters in uppercase. Returns an empty string if an exception occurs.</returns>
     public static string NormalizeText(this string input)
     {
         string pattern = "[^a-zA-Z가-힣0-9]";
@@ -133,7 +135,56 @@ public static class StringExtensions
             return "";
         }
     }
-    
+
+    /// <summary>
+    /// 한국 휴대전화 번호 형식으로 변환한다.
+    /// </summary>
+    /// <param name="input">변환할 휴대전화 번호 문자열</param>
+    /// <param name="isHyphen">하이픈을 포함할지 여부</param>
+    /// <returns>한국 휴대전화 번호 형식으로 변환된 문자열</returns>
+    public static string ToKoreanPhoneNumber(this string input, bool isHyphen = true)
+    {
+        if (input.IsEmpty())
+            return "";
+
+        string cleanedNumber = Regex.Replace(input, @"[^\d\+]", "");
+        if (cleanedNumber.StartsWith("+82"))
+            cleanedNumber = "0" + cleanedNumber.Substring(3);
+
+        if (isHyphen)
+        {
+            string formattedNumber = cleanedNumber;
+            try
+            {
+                if (cleanedNumber.Length == 11 && cleanedNumber.StartsWith("010"))
+                {
+                    formattedNumber = Regex.Replace(cleanedNumber, @"(\d{3})(\d{4})(\d{4})", "$1-$2-$3");
+                }
+                else if (cleanedNumber.StartsWith("02"))
+                {
+                    if (cleanedNumber.Length == 9)
+                    {
+                        formattedNumber = Regex.Replace(cleanedNumber, @"(\d{2})(\d{3})(\d{4})", "$1-$2-$3");
+                    }
+                    else if (cleanedNumber.Length == 10)
+                    {
+                        formattedNumber = Regex.Replace(cleanedNumber, @"(\d{2})(\d{4})(\d{4})", "$1-$2-$3");
+                    }
+                }
+                else if (cleanedNumber.Length == 10)
+                {
+                    formattedNumber = Regex.Replace(cleanedNumber, @"(\d{3})(\d{3})(\d{4})", "$1-$2-$3");
+                }
+            }
+            catch
+            {
+                return cleanedNumber;
+            }
+            return formattedNumber;
+        }
+
+        return cleanedNumber;
+    }
     
     
     /// <summary>
