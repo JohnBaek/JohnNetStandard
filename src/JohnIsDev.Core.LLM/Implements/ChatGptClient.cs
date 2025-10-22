@@ -53,7 +53,7 @@ public class ChatGptClient : IChatClient
         // Initialize ChatGptClient
         _apiKey = configuration["ChatGpt:ApiKey"] ?? "";
         _model = configuration["ChatGpt:Model"] ?? "";
-        _client = new ChatClient(model: "gpt-4o", apiKey: _model);
+        _client = new ChatClient(model: "gpt-4o", apiKey: _apiKey);
     }
 
     /// <summary>
