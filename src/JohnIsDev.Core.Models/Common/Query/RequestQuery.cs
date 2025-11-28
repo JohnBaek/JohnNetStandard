@@ -137,13 +137,12 @@ public class RequestQuery
     /// </summary>
     /// <param name="searchMetas">The list of SearchMeta objects that define the search and sort criteria.</param>
     /// <returns>The updated RequestQuery instance.</returns>
-    public RequestQuery AddSearchAndSortDefineRanges(List<RequestQuerySearchMeta> searchMetas)
+    public RequestQuery PrepareRanges(List<RequestQuerySearchMeta> searchMetas)
     {
         SearchMetas.Clear();
         SearchMetas.AddRange(searchMetas);
         return this;       
     }
-    
 
     /// <summary>
     /// 메타 정보를 추가한다.

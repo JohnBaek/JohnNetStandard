@@ -9,7 +9,7 @@ namespace JohnIsDev.Core.Features.Helpers;
 /// Provides utility methods for extracting query search metadata from properties of a specified type that are annotated
 /// with the <see cref="QueryMetaConvertAttribute"/>.
 /// </summary>
-public static class QuerySearchMapper
+public static class EntityMapper
 {
     /// <summary>
     /// A thread-safe, concurrent dictionary that serves as a cache for query search metadata.
@@ -24,7 +24,7 @@ public static class QuerySearchMapper
     /// </summary>
     /// <typeparam name="T">The type whose properties are inspected for query search metadata attributes.</typeparam>
     /// <returns>A list of <see cref="RequestQuerySearchMeta"/> objects containing metadata derived from the annotated properties.</returns>
-    public static List<RequestQuerySearchMeta> ExtractSearchMetaFromAttributes<T>()
+    public static List<RequestQuerySearchMeta> ToEntry<T>()
     {
         return _searchMetaCache.GetOrAdd(typeof(T), _ =>
         {

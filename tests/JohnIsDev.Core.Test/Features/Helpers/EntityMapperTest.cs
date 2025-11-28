@@ -7,14 +7,14 @@ using JohnIsDev.Core.Models.Common.Query;
 namespace JohnIsDev.Core.Test.Features.Helpers;
 
 /// <summary>
-/// Defines unit tests for the <see cref="QuerySearchMapper"/> class,
+/// Defines unit tests for the <see cref="EntityMapper"/> class,
 /// ensuring the functionality of its methods for extracting query search metadata from attributes.
 /// </summary>
-public class QuerySearchMapperTest
+public class EntityMapperTest
 {
     /// <summary>
     /// Validates the functionality of extracting search metadata from attributes applied to the properties
-    /// of a given class type using the <see cref="QuerySearchMapper.ExtractSearchMetaFromAttributes{T}"/> method.
+    /// of a given class type using the <see cref="EntityMapper.ToEntry{T}"/> method.
     /// </summary>
     /// <remarks>
     /// The method tests the following scenarios:
@@ -31,7 +31,7 @@ public class QuerySearchMapperTest
     {
         // Arrange
         // Act
-        List<RequestQuerySearchMeta> searchMetas = QuerySearchMapper.ExtractSearchMetaFromAttributes<TestClass>();
+        List<RequestQuerySearchMeta> searchMetas = EntityMapper.ToEntry<TestClass>();
   
         // Assert
         searchMetas.FirstOrDefault(i => i.Field == "Like")?.SearchType.Should().Be(EnumQuerySearchType.Like);
@@ -47,7 +47,7 @@ public class QuerySearchMapperTest
 
 
     /// <summary>
-    /// Ensures that the <see cref="QuerySearchMapper.ExtractSearchMetaFromAttributes{T}"/> method caches metadata
+    /// Ensures that the <see cref="EntityMapper.ToEntry{T}"/> method caches metadata
     /// derived from the annotated properties of the specified type after the first invocation.
     /// </summary>
     /// <remarks>
@@ -64,11 +64,11 @@ public class QuerySearchMapperTest
     public void ExtractSearchMetaFromAttributes_ShouldCached()
     {
         // Call first - Should be Reflected
-        var firstCall = QuerySearchMapper.ExtractSearchMetaFromAttributes<TestClass>();
+        var firstCall = EntityMapper.ToEntry<TestClass>();
         firstCall.Should().NotBeNull();
         
         // Call second - Should be Cached
-        var secondCall = QuerySearchMapper.ExtractSearchMetaFromAttributes<TestClass>();
+        var secondCall = EntityMapper.ToEntry<TestClass>();
         secondCall.Should().NotBeNull();
         
         // ReferenceEquals
