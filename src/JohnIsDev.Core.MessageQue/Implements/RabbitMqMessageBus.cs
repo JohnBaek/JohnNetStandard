@@ -304,6 +304,24 @@ public class RabbitMqMessageBus : IMessageBus
         }
     }
 
+    /// <summary>
+    /// Subscribes to an RPC queue in RabbitMQ to handle incoming messages and send responses asynchronously.
+    /// This method establishes a connection to the specified queue and processes messages using a defined handler.
+    /// </summary>
+    /// <typeparam name="TRequest">The type of the incoming message that will be received from the queue.</typeparam>
+    /// <typeparam name="TResponse">The type of the response message that will be sent back to the queue.</typeparam>
+    /// <param name="queue">The name of the queue to subscribe to for receiving requests.</param>
+    /// <param name="exchangeType">The type of the RabbitMQ exchange (e.g., direct, fanout, topic) through which the queue is bound.</param>
+    /// <param name="messageHandler">
+    /// A function delegate used to process incoming messages. This function takes the received message
+    /// as the first parameter, an optional correlationId as the second parameter, and returns
+    /// a response message asynchronously.
+    /// </param>
+    /// <returns>A Task that represents the asynchronous operation of subscribing and processing RPC messages.</returns>
+    public async Task SubscribeRpcAsync<TRequest, TResponse>(string queue, string exchangeType,
+        Func<TRequest, string, Task<TResponse>> messageHandler)
+        => await SubscribeRpcAsync(queue, queue.Replace("_", "."), exchangeType, messageHandler);
+
 
     /// <summary>
     /// Subscribes to a specified topic and routing key in the message queue and processes messages using

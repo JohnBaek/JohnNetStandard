@@ -65,4 +65,20 @@ public interface IMessageBus : IDisposable
         string routingKey,
         string exchangeType,
         Func<TRequest, string, Task<TResponse>> messageHandler);
+
+
+    /// <summary>
+    /// Subscribes to a queue for Remote Procedure Call (RPC) messages and processes incoming requests using the provided message handler asynchronously.
+    /// </summary>
+    /// <typeparam name="TRequest">The type of the request message that will be handled.</typeparam>
+    /// <typeparam name="TResponse">The type of the response message that will be returned.</typeparam>
+    /// <param name="queue">The name of the queue to subscribe to.</param>
+    /// <param name="routingKey">The routing key used for filtering messages in the queue.</param>
+    /// <param name="exchangeType">The type of the exchange associated with the queue.</param>
+    /// <param name="messageHandler">A function that processes the request message and returns a response. The function accepts the request message of type <typeparamref name="TRequest"/> and a string containing message metadata, and returns a task with the response of type <typeparamref name="TResponse"/>.</param>
+    /// <returns>A task that represents the asynchronous subscription operation.</returns>
+    Task SubscribeRpcAsync<TRequest, TResponse>(
+        string queue,
+        string exchangeType,
+        Func<TRequest, string, Task<TResponse>> messageHandler);
 }
