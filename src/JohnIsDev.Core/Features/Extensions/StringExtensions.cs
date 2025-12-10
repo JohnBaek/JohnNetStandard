@@ -199,4 +199,26 @@ public static class StringExtensions
         var regex = new Regex(@"^[0-9]+$");
         return regex.IsMatch(onlyDigits);
     }
+
+    /// <summary>
+    /// Extract IFrame Src
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    public static string ExtractIframeSrc(this string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return "";
+
+        var regex = new Regex(@"<iframe[^>]*\ssrc=['""]([^'""]+)['""]", RegexOptions.IgnoreCase);
+        var match = regex.Match(input);
+
+        if (match.Success)
+        {
+            // 캡처된 첫 번째 그룹(URL) 반환
+            return match.Groups[1].Value;
+        }
+
+        return "";
+    }
 }
