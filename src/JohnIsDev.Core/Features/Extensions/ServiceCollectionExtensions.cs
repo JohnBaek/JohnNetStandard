@@ -19,7 +19,12 @@ public static class ServiceCollectionExtensions
     /// <returns>IServiceCollection</returns>
     public static IServiceCollection AddCustomJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        byte[] keyBytes = Encoding.ASCII.GetBytes(configuration["jwt:secret"]);
+        // Get the JWT secret from the app settings.json file.
+        string jwtSecret = configuration["jwt:secret"] ?? "";
+        if (string.IsNullOrEmpty(jwtSecret))
+            throw new Exception("jwt:secret is not set.");
+
+        byte[] keyBytes = Encoding.ASCII.GetBytes(jwtSecret);
         services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
