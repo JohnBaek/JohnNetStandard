@@ -219,6 +219,6 @@ public static class StringExtensions
             return match.Groups[1].Value;
         }
 
-        return "";
+        return input;
     }
 }
