@@ -18,7 +18,7 @@ public static class DateExtension
    /// <exception cref="ArgumentException"></exception>
     public static HashSet<DateTime> GetBusinessDays(this DateTime from, DateTime to)
     {
-        // Validate for if its 'to' is more than 'from'
+        // Validate for if it's 'to' is more than 'from'
         if(from < to)
             throw new ArgumentException("The 'from' date must be earlier than or equal to the 'to' date.");
             
@@ -32,7 +32,7 @@ public static class DateExtension
         {
             DayOfWeek currentDay = current.DayOfWeek;
 
-            // Checks current day includes not in Business Day
+            // Checks current day includes it not in Business Day
             if (!noneBusinessDays.Contains(currentDay))
             {
                 result.Add(current);                    
