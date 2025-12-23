@@ -202,7 +202,7 @@ public class QueryExecutor<TDbContext>(
             ResponseList<TQueryable> result = await ToResponseListAsync(queryable, requestQuery);
             
             // Convert TQueryable to TConvert List Collection
-            List<TConvert> convertList = new List<TConvert>(result.Items.Select(resultItem => resultItem.FromCopyValueDeep<TConvert>()));
+            List<TConvert> convertList = new List<TConvert>(result.Items.Select(resultItem => resultItem.FromCopyValueUniversal<TConvert>()));
             
             // Convert ResponseList<TConvert>
             return new ResponseList<TConvert>

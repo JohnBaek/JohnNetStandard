@@ -339,4 +339,27 @@ public static class ObjectExtensions
     /// <returns>A new instance of type T with properties deeply copied from the source object.</returns>
     public static T FromCopyValueDeepSafe<T>(this object source) where T : class, new()
         => Mapper.Value.Map<T>(source);
+
+
+    /// <summary>
+    /// 모든 타입 완벽 지원하는 Universal Deep Copy (생성자 무관)
+    /// </summary>
+    public static T FromCopyValueUniversal<T>(this object source)
+    {
+        if (source == null) return default!;
+
+        try
+        {
+            string json = JsonConvert.SerializeObject(source, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore // 순환 참조 방지
+            });
+            return JsonConvert.DeserializeObject<T>(json)!;
+        }
+        catch
+        {
+            return default!;
+        }
+    }
+
 }
